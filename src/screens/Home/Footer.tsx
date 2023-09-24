@@ -4,6 +4,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useTheme} from '../../../ThemeProvider';
 import {MAIN_TABS} from './types';
 import {TextContent} from '../../components/TextContent';
+import {useNavigator} from '../../../NavigationUtils';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface IFooterProps {
   activeTab: MAIN_TABS;
@@ -35,13 +37,18 @@ const tabs: {name: MAIN_TABS; iconName: string}[] = [
 
 export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
   const {theme} = useTheme();
+  const {navigate} = useNavigator();
+  const insets = useSafeAreaInsets();
 
   return (
     <>
       <View
         style={[
           styles.container,
-          {backgroundColor: theme.colors.surface[100]},
+          {
+            backgroundColor: theme.colors.surface[100],
+            paddingBottom: insets.bottom + 4,
+          },
         ]}>
         {tabs.map((tab, index) => {
           const isActive = tab.name === activeTab;
@@ -73,11 +80,8 @@ export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
         })}
       </View>
 
-      <View style={styles.addButtonContainer}>
-        <Pressable
-          style={styles.addButton}
-          // onPress={() => navigate('Add')}
-        >
+      <View style={[styles.addButtonContainer, {bottom: 98 + insets.bottom}]}>
+        <Pressable style={styles.addButton} onPress={() => navigate('Add')}>
           <MaterialCommunityIcons
             name="plus"
             size={28}
@@ -131,5 +135,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   activeTabName: {fontSize: 10, fontFamily: 'Inter-ExtraBold'},
-  iconContainer: {paddingVertical: 4, paddingHorizontal: 12, borderRadius: 16},
+  iconContainer: {
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0)',
+  },
 });

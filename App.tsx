@@ -1,7 +1,11 @@
 import React from 'react';
-import {SafeAreaView, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import {Home} from './src/screens/Home/Home';
 import {useTheme} from './ThemeProvider';
+import {NavigationContainer} from '@react-navigation/native';
+import {Stack} from './NavigationUtils';
+import {Add} from './src/screens/Add/Add';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 function App(): JSX.Element {
   const {theme} = useTheme();
@@ -12,14 +16,37 @@ function App(): JSX.Element {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaProvider style={backgroundStyle}>
       <StatusBar
         barStyle={'light-content'}
         backgroundColor={'rgba(0,0,0,0)'}
         translucent={true}
       />
-      <Home />
-    </SafeAreaView>
+
+      <NavigationContainer
+        theme={{
+          dark: theme.isDark,
+          colors: {
+            background: theme.colors.background,
+            border: theme.colors.background,
+            card: theme.colors.background,
+            notification: theme.colors.background,
+            primary: theme.colors.primary[100],
+            text: theme.colors.text,
+          },
+        }}>
+        <Stack.Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            headerShown: false,
+            animation: 'none',
+            navigationBarColor: theme.colors.surface[100],
+          }}>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Add" component={Add} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
