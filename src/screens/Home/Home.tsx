@@ -1,24 +1,32 @@
 import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Header} from './Header';
-import {useTheme} from '../../../ThemeProvider';
 import {MAIN_TABS} from './types';
 import {Footer} from './Footer';
+import moment, {Moment} from 'moment';
+import {Today} from './Today';
 
 export const Home = () => {
-  const {theme} = useTheme();
   const [activeTab, setActiveTab] = useState(MAIN_TABS.TODAY);
+  const [currentDate, setCurrentDate] = useState(moment().startOf('day'));
+
+  const updateCurrentDate = (date: Moment) => setCurrentDate(date);
 
   const updateActiveTab = (screen: MAIN_TABS) => setActiveTab(screen);
 
   return (
     <View style={[styles.container]}>
-      <Header title={activeTab} />
+      <Header activeTab={activeTab} currentDate={currentDate} />
       <Footer activeTab={activeTab} updateActiveTab={updateActiveTab} />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View style={{marginTop: 200}}>
-          <Text style={{color: theme.colors.text}}>Hello</Text>
+        <View style={{marginTop: 100}}>
+          {activeTab === MAIN_TABS.TODAY && (
+            <Today
+              currentDate={currentDate}
+              updateCurrentDate={updateCurrentDate}
+            />
+          )}
         </View>
       </ScrollView>
     </View>

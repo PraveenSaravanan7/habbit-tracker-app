@@ -1,15 +1,27 @@
 import React from 'react';
 import {Pressable, StatusBar, StyleSheet, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
+import {MAIN_TABS} from './types';
+import moment, {Moment} from 'moment';
 
 interface IHeaderProps {
-  title: string;
+  activeTab: MAIN_TABS;
+  currentDate: Moment;
 }
 
-export const Header = ({title}: IHeaderProps) => {
+export const Header = ({activeTab, currentDate}: IHeaderProps) => {
   const {theme} = useTheme();
+
+  const title = (() => {
+    if (activeTab !== MAIN_TABS.TODAY) return activeTab;
+
+    if (currentDate.isSame(moment().startOf('day'))) return 'Today';
+
+    return currentDate.format('MMM Do, YYYY');
+  })();
 
   return (
     <View
@@ -29,15 +41,11 @@ export const Header = ({title}: IHeaderProps) => {
       </View>
       <View style={[styles.iconContainer]}>
         <Pressable>
-          <MaterialCommunityIcons
-            name="calendar"
-            color={theme.colors.text}
-            size={28}
-          />
+          <MaterialIcons name={'search'} color={theme.colors.text} size={28} />
         </Pressable>
         <Pressable>
           <MaterialCommunityIcons
-            name={'help-circle-outline'}
+            name="calendar"
             color={theme.colors.text}
             size={28}
           />
