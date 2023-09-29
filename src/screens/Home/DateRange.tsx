@@ -97,12 +97,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 18,
     color: '#fff',
     fontFamily: 'Inter-Bold',
   },
   dayText: {
-    fontSize: 14,
+    fontSize: 10,
     color: '#fff',
     fontFamily: 'Inter-Bold',
   },
