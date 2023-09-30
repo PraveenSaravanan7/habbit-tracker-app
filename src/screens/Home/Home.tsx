@@ -16,7 +16,11 @@ export const Home = () => {
 
   return (
     <View style={[styles.container]}>
-      <Header activeTab={activeTab} currentDate={currentDate} />
+      <Header
+        activeTab={activeTab}
+        currentDate={currentDate}
+        updateCurrentDate={updateCurrentDate}
+      />
       <Footer activeTab={activeTab} updateActiveTab={updateActiveTab} />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">

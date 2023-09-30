@@ -8,6 +8,7 @@ export interface ITheme {
   name: THEMES;
   isDark: boolean;
   colors: {
+    transparentBackdrop: string;
     background: string;
     text: string;
     primary: {
@@ -33,6 +34,7 @@ const dark: ITheme = {
   name: THEMES.DARK,
   isDark: true,
   colors: {
+    transparentBackdrop: 'rgba(0,0,0,0.85)',
     background: '#000000',
     text: '#ffffff',
     primary: {

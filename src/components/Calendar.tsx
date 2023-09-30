@@ -1,11 +1,11 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../ThemeProvider';
 import {TextContent} from './TextContent';
 import moment, {Moment} from 'moment';
 
-interface ICalendar {
+export interface ICalendar {
   selectedDate: Moment;
   updateCurrentDate: (date: Moment) => void;
 }
@@ -19,6 +19,12 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
 
   const moveMonth = (noOfMonth: number) =>
     setMonth(prev => moment(prev).add(noOfMonth, 'M'));
+
+  useEffect(() => {
+    if (selectedDate.month() !== month.month())
+      setMonth(moment(selectedDate).startOf('month'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
 
   return (
     <View
