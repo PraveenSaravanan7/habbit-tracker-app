@@ -1,5 +1,5 @@
 import moment, {Moment} from 'moment';
-import React from 'react';
+import React, {useState} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
@@ -14,7 +14,7 @@ export const DateRange = ({
   updateCurrentDate,
 }: IDateRangeProps) => {
   const {theme} = useTheme();
-  const dateList = getDateList();
+  const dateList = useDateList({currentDate});
   const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
@@ -60,16 +60,24 @@ export const DateRange = ({
   );
 };
 
-export const getDateList = () => {
-  const today = moment().startOf('day');
-  let range = 10;
+export const useDateList = ({currentDate}: {currentDate: Moment}) => {
+  const getList = (date = moment().startOf('day')) => {
+    const list: Moment[] = [];
 
-  const list: Moment[] = [];
-  let x = -1 * range;
+    let range = 10;
+    let x = -1 * range;
 
-  while (x <= range) list.push(today.clone().startOf('day').add(x++, 'days'));
+    while (x <= range) list.push(moment(date).startOf('day').add(x++, 'days'));
 
-  return list;
+    return list;
+  };
+
+  const [dateList, setDateList] = useState(getList());
+
+  if (!currentDate.isBetween(dateList.at(0), dateList.at(-1), 'day', '[]'))
+    setDateList(getList(currentDate));
+
+  return dateList;
 };
 
 const styles = StyleSheet.create({
