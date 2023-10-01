@@ -21,6 +21,13 @@ export const CalendarModal = ({
 }: ICalendarModal) => {
   const {theme} = useTheme();
 
+  const closeModal = () => updateCalendarModalVisibility(false);
+
+  const handleUpdateDate = (date: Moment) => {
+    updateCurrentDate(date);
+    closeModal();
+  };
+
   return (
     <Modal
       fullWidth
@@ -34,7 +41,7 @@ export const CalendarModal = ({
         ]}>
         <Calendar
           selectedDate={currentDate}
-          updateCurrentDate={updateCurrentDate}
+          updateCurrentDate={handleUpdateDate}
         />
         <View
           style={[
@@ -42,7 +49,7 @@ export const CalendarModal = ({
             {borderColor: theme.colors.surface[200]},
           ]}>
           <Pressable
-            onPress={() => updateCalendarModalVisibility(false)}
+            onPress={closeModal}
             style={[
               styles.button,
               {backgroundColor: theme.colors.surface[100]},
@@ -52,7 +59,7 @@ export const CalendarModal = ({
             </TextContent>
           </Pressable>
           <Pressable
-            onPress={() => updateCurrentDate(moment().startOf('day'))}
+            onPress={() => handleUpdateDate(moment().startOf('day'))}
             style={[
               styles.button,
               {backgroundColor: theme.colors.surface[100]},

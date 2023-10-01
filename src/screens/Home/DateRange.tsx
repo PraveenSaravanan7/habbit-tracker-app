@@ -1,5 +1,5 @@
 import moment, {Moment} from 'moment';
-import React, {useRef} from 'react';
+import React from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
@@ -17,13 +17,9 @@ export const DateRange = ({
   const dateList = getDateList();
   const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const scrollViewRef = useRef<FlatList>(null);
-
   return (
     <FlatList
       initialNumToRender={dateList.length}
-      contentOffset={{x: 500, y: 0}}
-      ref={scrollViewRef}
       showsHorizontalScrollIndicator={false}
       horizontal={true}
       data={dateList}
