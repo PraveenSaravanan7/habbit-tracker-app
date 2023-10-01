@@ -1,6 +1,13 @@
 import moment, {Moment} from 'moment';
-import React, {useState} from 'react';
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useLayoutEffect, useRef, useState} from 'react';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ViewToken,
+} from 'react-native';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 
@@ -17,12 +24,47 @@ export const DateRange = ({
   const dateList = useDateList({currentDate});
   const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  const listContainerRef = useRef<FlatList | null>(null);
+  const visibleItemsRef = useRef<number[] | null>(null);
+  let activeItemIndexRef = useRef<number | null>(null);
+
+  const onViewableItemsChanged = useCallback(
+    ({viewableItems}: {viewableItems: ViewToken[]}) => {
+      visibleItemsRef.current = viewableItems.reduce<number[]>(
+        (acc, item, index) => {
+          if (index > 0 && index < viewableItems.length - 1)
+            acc.push(item.index || 0);
+
+          return acc;
+        },
+        [],
+      );
+    },
+    [],
+  );
+
+  useLayoutEffect(() => {
+    if (
+      activeItemIndexRef.current !== null &&
+      activeItemIndexRef.current > -1 &&
+      !visibleItemsRef.current?.includes(activeItemIndexRef.current)
+    ) {
+      listContainerRef.current?.scrollToOffset({
+        offset: activeItemIndexRef.current * 48,
+        animated: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDate]);
+
   return (
     <FlatList
+      ref={listContainerRef}
       initialNumToRender={dateList.length}
       showsHorizontalScrollIndicator={false}
       horizontal={true}
       data={dateList}
+      onViewableItemsChanged={onViewableItemsChanged}
       renderItem={({item: date, index}) => {
         const isActive = date.isSame(currentDate);
         const backgroundColor = isActive
@@ -30,6 +72,8 @@ export const DateRange = ({
           : theme.colors.surface[300];
         const opacity = isActive ? 1 : 0.6;
         const fontFamily = isActive ? 'Inter-Bold' : 'Inter-Medium';
+
+        if (isActive) activeItemIndexRef.current = index;
 
         return (
           <Pressable onPress={() => updateCurrentDate(date)} key={index}>
