@@ -2,5 +2,5 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "java.compile.nullAnalysis.mode": "automatic",
   "editor.formatOnSave": true,
-  "cSpell.words": ["Pressable"]
+  "cSpell.words": ["lokijs", "Pressable"]
 }
