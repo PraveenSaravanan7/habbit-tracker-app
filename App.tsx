@@ -6,9 +6,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {Stack} from './NavigationUtils';
 import {Add} from './src/screens/Add/Add';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import database from './src/database/database';
 
 function App(): JSX.Element {
   const {theme} = useTheme();
+
+  database;
 
   const backgroundStyle = {
     backgroundColor: theme.colors.background,

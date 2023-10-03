@@ -2,5 +2,14 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "java.compile.nullAnalysis.mode": "automatic",
   "editor.formatOnSave": true,
-  "cSpell.words": ["lokijs", "Pressable"]
+  "cSpell.words": [
+    "darkorange",
+    "deeppink",
+    "deepskyblue",
+    "dodgerblue",
+    "ellipsize",
+    "lokijs",
+    "Pressable",
+    "skyblue"
+  ]
 }

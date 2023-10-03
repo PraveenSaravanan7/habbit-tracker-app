@@ -5,6 +5,7 @@ import {MAIN_TABS} from './types';
 import {Footer} from './Footer';
 import moment, {Moment} from 'moment';
 import {Today} from './Today';
+import {Category} from './Category';
 
 export const Home = () => {
   const [activeTab, setActiveTab] = useState(MAIN_TABS.TODAY);
@@ -31,6 +32,7 @@ export const Home = () => {
               updateCurrentDate={updateCurrentDate}
             />
           )}
+          {activeTab === MAIN_TABS.CATEGORY && <Category />}
         </View>
       </ScrollView>
     </View>

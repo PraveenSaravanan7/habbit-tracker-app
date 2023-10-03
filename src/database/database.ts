@@ -1,5 +1,6 @@
 import loki from 'lokijs';
 import adapter from './adapter';
+import migration from './migration';
 
 const database = new loki('db.json', {
   env: 'NA',
@@ -11,6 +12,8 @@ const database = new loki('db.json', {
   autoloadCallback: () => {
     console.log('--autoloadCallback');
     //Todo: Add migration script
+
+    migration();
   },
 });
 

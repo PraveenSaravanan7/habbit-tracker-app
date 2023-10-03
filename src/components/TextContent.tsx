@@ -1,11 +1,26 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, TextProps} from 'react-native';
 import {useTheme} from '../../ThemeProvider';
 
-export const TextContent = ({children}: {children: JSX.Element}) => {
+interface ITextContent {
+  children: JSX.Element;
+  numberOfLines?: number;
+  ellipsizeMode?: TextProps['ellipsizeMode'];
+}
+
+export const TextContent = ({
+  numberOfLines,
+  ellipsizeMode,
+  children,
+}: ITextContent) => {
   const {theme} = useTheme();
   return (
-    <Text style={[styles.text, {color: theme.colors.text}]}>{children}</Text>
+    <Text
+      numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
+      style={[styles.text, {color: theme.colors.text}]}>
+      {children}
+    </Text>
   );
 };
 
