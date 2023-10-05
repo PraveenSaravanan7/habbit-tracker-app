@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal as RnModal, StyleSheet, View} from 'react-native';
+import {DimensionValue, Modal as RnModal, StyleSheet, View} from 'react-native';
 import {useTheme} from '../../ThemeProvider';
 
 export interface IModal {
@@ -7,7 +7,7 @@ export interface IModal {
   updateVisibility: (isVisible: boolean) => void;
   children: JSX.Element;
   placeContentAtBottom?: boolean;
-  fullWidth?: boolean;
+  width?: DimensionValue;
 }
 
 export const Modal = ({
@@ -15,7 +15,7 @@ export const Modal = ({
   updateVisibility,
   children,
   placeContentAtBottom,
-  fullWidth,
+  width = '100%',
 }: IModal) => {
   const {theme} = useTheme();
 
@@ -35,11 +35,7 @@ export const Modal = ({
           placeContentAtBottom && styles.placeContentAtBottom,
         ]}>
         <View
-          style={[
-            styles.modalView,
-            {shadowColor: theme.colors.text},
-            fullWidth && styles.fullWidth,
-          ]}>
+          style={[styles.modalView, {shadowColor: theme.colors.text, width}]}>
           {children}
         </View>
       </View>

@@ -30,7 +30,6 @@ export const CalendarModal = ({
 
   return (
     <Modal
-      fullWidth
       placeContentAtBottom
       isVisible={isCalendarOpen}
       updateVisibility={updateCalendarModalVisibility}>
@@ -77,6 +76,8 @@ export const CalendarModal = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   actionsContainer: {
     width: '100%',

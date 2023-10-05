@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useTheme} from '../../ThemeProvider';
 import {TextContent} from './TextContent';
 import moment, {Moment} from 'moment';
+import {Modal} from './Modal';
 
 export interface ICalendar {
   selectedDate: Moment;
@@ -20,6 +21,9 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
   const moveMonth = (noOfMonth: number) =>
     setMonth(prev => moment(prev).add(noOfMonth, 'M'));
 
+  const moveYear = (noOfYear: number) =>
+    setMonth(prev => moment(prev).add(noOfYear, 'years'));
+
   useEffect(() => {
     if (selectedDate.month() !== month.month())
       setMonth(moment(selectedDate).startOf('month'));
@@ -29,7 +33,7 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
   return (
     <View
       style={[styles.container, {backgroundColor: theme.colors.surface[100]}]}>
-      <Header month={month} moveMonth={moveMonth} />
+      <Header month={month} moveMonth={moveMonth} moveYear={moveYear} />
       <Grid
         month={month}
         selectedDate={selectedDate}
@@ -39,44 +43,154 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
   );
 };
 
+export interface IYearAndMonthModalProps {
+  isVisible: boolean;
+  updateVisibility: (isVisible: boolean) => void;
+  month: Moment;
+  moveMonth: (n: number) => void;
+  moveYear: (n: number) => void;
+}
+const YearAndMonthModal = ({
+  isVisible,
+  updateVisibility,
+  month,
+  moveMonth,
+  moveYear,
+}: IYearAndMonthModalProps) => {
+  const {theme} = useTheme();
+  const [noYear, setNoYear] = useState(0);
+  const [noMonth, setNoMonth] = useState(0);
+
+  const closeModal = () => updateVisibility(false);
+
+  const onOk = () => {
+    moveMonth(noMonth);
+    moveYear(noYear);
+    closeModal();
+  };
+
+  return (
+    <Modal
+      isVisible={isVisible}
+      updateVisibility={updateVisibility}
+      width={'80%'}>
+      <View
+        style={[
+          styles.yearAndMonthModalContainer,
+          {backgroundColor: theme.colors.surface[100]},
+        ]}>
+        <View
+          style={[
+            styles.yearSelectorHead,
+            {borderColor: theme.colors.surface[200]},
+          ]}>
+          <TextContent>
+            <Text
+              style={[
+                styles.yearSelectorHeadText,
+                {color: theme.colors.disabledText},
+              ]}>
+              Select a date
+            </Text>
+          </TextContent>
+        </View>
+        <View style={[styles.yearSelector]}>
+          <HorizontalMover
+            onLeftPress={() => setNoYear(prev => prev - 1)}
+            onRightPress={() => setNoYear(prev => prev + 1)}>
+            <TextContent>
+              <Text style={[styles.mounthText, {color: theme.colors.text}]}>
+                {moment(month, dateFormat).add(noYear, 'years').format('YYYY')}
+              </Text>
+            </TextContent>
+          </HorizontalMover>
+          <HorizontalMover
+            onLeftPress={() => setNoMonth(prev => prev - 1)}
+            onRightPress={() => setNoMonth(prev => prev + 1)}>
+            <TextContent>
+              <Text style={[styles.mounthText, {color: theme.colors.text}]}>
+                {moment(month, dateFormat)
+                  .add(noMonth, 'months')
+                  .format('MMMM')}
+              </Text>
+            </TextContent>
+          </HorizontalMover>
+        </View>
+        <View
+          style={[
+            styles.actionsContainer,
+            {borderColor: theme.colors.surface[200]},
+          ]}>
+          <Pressable
+            onPress={closeModal}
+            style={[
+              styles.button,
+              {backgroundColor: theme.colors.surface[100]},
+            ]}>
+            <TextContent>
+              <Text style={[styles.buttonText]}>CANCEL</Text>
+            </TextContent>
+          </Pressable>
+          <Pressable
+            onPress={onOk}
+            style={[
+              styles.button,
+              {backgroundColor: theme.colors.surface[100]},
+            ]}>
+            <TextContent>
+              <Text style={[styles.buttonText]}>OK</Text>
+            </TextContent>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const Header = ({
   month,
   moveMonth,
+  moveYear,
 }: {
   month: Moment;
   moveMonth: (n: number) => void;
+  moveYear: (n: number) => void;
 }) => {
   const {theme} = useTheme();
 
+  const [isVisible, setIsVisible] = useState(false);
+
+  const updateVisibility = (visibility: boolean) => setIsVisible(visibility);
+
   return (
-    <View style={[styles.header]}>
-      <Pressable onPress={() => moveMonth(-1)}>
-        <MaterialCommunityIcons
-          name="chevron-left"
-          color={theme.colors.primary[100]}
-          size={28}
+    <>
+      {isVisible && (
+        <YearAndMonthModal
+          isVisible={isVisible}
+          updateVisibility={updateVisibility}
+          month={month}
+          moveMonth={moveMonth}
+          moveYear={moveYear}
         />
-      </Pressable>
-      <View style={[styles.headerMonthAndYearContainer]}>
-        <TextContent>
-          <Text style={[styles.mounthText, {color: theme.colors.text}]}>
-            {moment(month, dateFormat).format('MMMM')}
-          </Text>
-        </TextContent>
-        <TextContent>
-          <Text style={[styles.yearText, {color: theme.colors.text}]}>
-            {moment(month, dateFormat).format('YYYY')}
-          </Text>
-        </TextContent>
-      </View>
-      <Pressable onPress={() => moveMonth(1)}>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          color={theme.colors.primary[100]}
-          size={28}
-        />
-      </Pressable>
-    </View>
+      )}
+      <HorizontalMover
+        onLeftPress={() => moveMonth(-1)}
+        onRightPress={() => moveMonth(1)}
+        onCenterPress={() => updateVisibility(true)}>
+        <>
+          <TextContent>
+            <Text style={[styles.mounthText, {color: theme.colors.text}]}>
+              {moment(month, dateFormat).format('MMMM')}
+            </Text>
+          </TextContent>
+          <TextContent>
+            <Text style={[styles.yearText, {color: theme.colors.text}]}>
+              {moment(month, dateFormat).format('YYYY')}
+            </Text>
+          </TextContent>
+        </>
+      </HorizontalMover>
+    </>
   );
 };
 
@@ -181,6 +295,46 @@ const Days = ({
   );
 };
 
+interface IHorizontalMover {
+  onLeftPress: () => void;
+  onRightPress: () => void;
+  onCenterPress?: () => void;
+  children: JSX.Element;
+}
+
+const HorizontalMover = ({
+  onLeftPress,
+  onRightPress,
+  onCenterPress = () => {},
+  children,
+}: IHorizontalMover) => {
+  const {theme} = useTheme();
+
+  return (
+    <View style={[styles.header]}>
+      <Pressable onPress={onLeftPress}>
+        <MaterialCommunityIcons
+          name="chevron-left"
+          color={theme.colors.primary[100]}
+          size={28}
+        />
+      </Pressable>
+      <Pressable
+        onPress={onCenterPress}
+        style={[styles.headerMonthAndYearContainer]}>
+        {children}
+      </Pressable>
+      <Pressable onPress={onRightPress}>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          color={theme.colors.primary[100]}
+          size={28}
+        />
+      </Pressable>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -246,5 +400,45 @@ const styles = StyleSheet.create({
     columnGap: 8,
     // paddingHorizontal: 8,
     // backgroundColor: 'red',
+  },
+  yearSelector: {
+    width: '100%',
+    flexDirection: 'column',
+    borderRadius: 20,
+    padding: 16,
+    rowGap: 20,
+  },
+  actionsContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    borderTopWidth: 1,
+  },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+  },
+  buttonText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 12,
+  },
+  yearSelectorHead: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    padding: 16,
+  },
+  yearSelectorHeadText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+  },
+  yearAndMonthModalContainer: {
+    borderRadius: 20,
   },
 });

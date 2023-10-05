@@ -11,6 +11,7 @@ export interface ITheme {
     transparentBackdrop: string;
     background: string;
     text: string;
+    disabledText: string;
     primary: {
       100: string;
       200: string;
@@ -37,6 +38,7 @@ const dark: ITheme = {
     transparentBackdrop: 'rgba(0,0,0,0.85)',
     background: '#000000',
     text: '#ffffff',
+    disabledText: 'rgba(255,255,255,0.5)',
     primary: {
       100: '#673ab7',
       200: '#7a4fbf',
