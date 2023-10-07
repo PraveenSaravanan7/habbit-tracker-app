@@ -1,11 +1,10 @@
 import React, {useLayoutEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
-import {ICategory} from '../../database/models/category';
-import database from '../../database/database';
-import COLLECTION from '../../database/collections';
+import categoryModel, {ICategory} from '../../database/models/category';
 import {TextContent} from '../../components/TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../../ThemeProvider';
+import {AddCategoryModal} from './AddCategoryModal';
 
 export const Category = () => {
   const {theme} = useTheme();
@@ -13,10 +12,17 @@ export const Category = () => {
   const [defaultCategories, setDefaultCategories] = useState<ICategory[]>([]);
   const [customCategories, setCustomCategories] = useState<ICategory[]>([]);
 
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+
+  const updateAddCategoryModalVisibility = (visibility: boolean) =>
+    setIsAddCategoryOpen(visibility);
+
+  const addCategory = (category: ICategory) => {
+    setCustomCategories(prev => [...prev, category]);
+  };
+
   useLayoutEffect(() => {
-    const categories = database
-      .getCollection<ICategory>(COLLECTION.CATEGORIES)
-      ?.find();
+    const categories = categoryModel.find();
 
     const defaultItems: ICategory[] = [];
     const customItems: ICategory[] = [];
@@ -61,46 +67,53 @@ export const Category = () => {
   );
 
   return (
-    <View style={[styles.container]}>
-      <View style={[styles.listNameContainer]}>
-        <TextContent style={[styles.listName]}>Default categories</TextContent>
-      </View>
-      <ScrollView
-        horizontal
-        contentContainerStyle={[styles.listContainer]}
-        showsHorizontalScrollIndicator={false}>
-        {defaultCategories.map(category =>
-          category.isCustom ? null : (
-            <Item category={category} key={category.id} />
-          ),
-        )}
-      </ScrollView>
-      <View
-        style={[styles.br, {borderBottomColor: theme.colors.surface[200]}]}
-      />
-      <View style={[styles.listNameContainer]}>
-        <TextContent style={[styles.listName]}>Custom categories</TextContent>
-      </View>
-      {!customCategories.length ? (
-        <EmptyBanner />
-      ) : (
+    <>
+      <View style={[styles.container]}>
+        <View style={[styles.listNameContainer]}>
+          <TextContent style={[styles.listName]}>
+            Default categories
+          </TextContent>
+        </View>
         <ScrollView
           horizontal
           contentContainerStyle={[styles.listContainer]}
           showsHorizontalScrollIndicator={false}>
-          {customCategories.map(category =>
-            category.isCustom ? null : (
-              <Item category={category} key={category.id} />
-            ),
-          )}
+          {defaultCategories.map(category => (
+            <Item category={category} key={category.id} />
+          ))}
         </ScrollView>
+        <View
+          style={[styles.br, {borderBottomColor: theme.colors.surface[200]}]}
+        />
+        <View style={[styles.listNameContainer]}>
+          <TextContent style={[styles.listName]}>Custom categories</TextContent>
+        </View>
+        {!customCategories.length && <EmptyBanner />}
+        {!!customCategories.length && (
+          <ScrollView
+            horizontal
+            contentContainerStyle={[styles.listContainer]}
+            showsHorizontalScrollIndicator={false}>
+            {customCategories.map(category => (
+              <Item category={category} key={category.id} />
+            ))}
+          </ScrollView>
+        )}
+        <Pressable
+          onPress={() => updateAddCategoryModalVisibility(true)}
+          style={[styles.button, {backgroundColor: theme.colors.primary[100]}]}>
+          <TextContent style={[styles.buttonText]}>NEW CATEGORY</TextContent>
+        </Pressable>
+      </View>
+
+      {isAddCategoryOpen && (
+        <AddCategoryModal
+          isOpen={isAddCategoryOpen}
+          updateVisibility={updateAddCategoryModalVisibility}
+          addCategory={addCategory}
+        />
       )}
-      <Pressable
-        // onPress={() => handleUpdateDate(moment().startOf('day'))}
-        style={[styles.button, {backgroundColor: theme.colors.primary[100]}]}>
-        <TextContent style={[styles.buttonText]}>NEW CATEGORY</TextContent>
-      </Pressable>
-    </View>
+    </>
   );
 };
 
@@ -170,6 +183,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginHorizontal: 16,
+    marginTop: 8,
   },
   buttonText: {
     fontFamily: 'Inter-Bold',

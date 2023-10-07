@@ -1,4 +1,6 @@
 import glyphmaps from 'react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json';
+import database from '../database';
+import COLLECTION from '../collections';
 
 export interface ICategory {
   id: string;
@@ -7,3 +9,7 @@ export interface ICategory {
   color: string;
   isCustom?: boolean;
 }
+
+const categoryModel = database.getCollection<ICategory>(COLLECTION.CATEGORIES);
+
+export default categoryModel;
