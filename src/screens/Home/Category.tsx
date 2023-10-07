@@ -19,6 +19,7 @@ export const Category = () => {
 
   const addCategory = (category: ICategory) => {
     setCustomCategories(prev => [...prev, category]);
+    categoryModel.insertOne(category);
   };
 
   useLayoutEffect(() => {
