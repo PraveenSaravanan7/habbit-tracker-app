@@ -3,6 +3,7 @@ import COLLECTION from './collections';
 import database from './database';
 import {ICategory} from './models/category';
 import {v4 as uuid} from 'uuid';
+import {commonColors} from '../../themes';
 
 const migration = () => {
   initHabits();
@@ -27,91 +28,91 @@ const initCategories = () => {
       id: uuid(),
       icon: 'block-helper',
       name: 'Quit a bad habit',
-      color: 'darkred',
+      color: commonColors.salmon,
     },
     {
       id: uuid(),
       icon: 'brush',
       name: 'Art',
-      color: 'crimson',
+      color: commonColors.cerise,
     },
     {
       id: uuid(),
       icon: 'clock-outline',
       name: 'Task',
-      color: 'orangered',
+      color: commonColors.fuchsia,
     },
     {
       id: uuid(),
       icon: 'meditation',
       name: 'Meditation',
-      color: 'darkorange',
+      color: commonColors.blueViolet,
     },
     {
       id: uuid(),
       icon: 'school',
       name: 'Study',
-      color: 'goldenrod',
+      color: commonColors.royalBlue,
     },
     {
       id: uuid(),
       icon: 'bike',
       name: 'Sports',
-      color: 'cornflowerblue',
+      color: commonColors.azure,
     },
     {
       id: uuid(),
       icon: 'ticket',
       name: 'Entertainment',
-      color: 'dodgerblue',
+      color: commonColors.teal,
     },
     {
       id: uuid(),
       icon: 'android-messages',
       name: 'Social',
-      color: 'deepskyblue',
+      color: commonColors.seaGreen,
     },
     {
       id: uuid(),
       icon: 'piggy-bank',
       name: 'Finance',
-      color: 'darkturquoise',
+      color: commonColors.shamrockGreen,
     },
     {
       id: uuid(),
       icon: 'hospital',
       name: 'Health',
-      color: 'cadetblue',
+      color: commonColors.green,
     },
     {
       id: uuid(),
       icon: 'briefcase',
       name: 'Work',
-      color: 'goldenrod',
+      color: commonColors.oliveGreen,
     },
     {
       id: uuid(),
       icon: 'silverware-variant',
       name: 'Nutrition',
-      color: 'rosybrown',
+      color: commonColors.mustard,
     },
     {
       id: uuid(),
       icon: 'home',
       name: 'Home',
-      color: 'teal',
+      color: commonColors.orange,
     },
     {
       id: uuid(),
       icon: 'terrain',
       name: 'Outdoor',
-      color: 'yellowgreen',
+      color: commonColors.redOrange,
     },
     {
       id: uuid(),
       icon: 'apps',
       name: 'Other',
-      color: 'slateblue',
+      color: commonColors.rust,
     },
   ];
 

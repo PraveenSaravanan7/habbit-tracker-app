@@ -2,23 +2,12 @@ import React from 'react';
 import {StyleSheet, Text, TextProps} from 'react-native';
 import {useTheme} from '../../ThemeProvider';
 
-interface ITextContent {
-  children: JSX.Element;
-  numberOfLines?: number;
-  ellipsizeMode?: TextProps['ellipsizeMode'];
-}
-
-export const TextContent = ({
-  numberOfLines,
-  ellipsizeMode,
-  children,
-}: ITextContent) => {
+export const TextContent = ({children, style, ...restProps}: TextProps) => {
   const {theme} = useTheme();
   return (
     <Text
-      numberOfLines={numberOfLines}
-      ellipsizeMode={ellipsizeMode}
-      style={[styles.text, {color: theme.colors.text}]}>
+      {...restProps}
+      style={[styles.text, {color: theme.colors.text}, style]}>
       {children}
     </Text>
   );

@@ -59,3 +59,26 @@ const dark: ITheme = {
 };
 
 export const themes: ITheme[] = [dark];
+
+export const commonColors = {
+  red: '#d2382e', // x
+  salmon: '#e54456',
+  cerise: '#d12d60',
+  fuchsia: '#cc33a7',
+  purple: '#bf32cc', // x
+  blueViolet: '#8c4de6',
+  indigo: '#7667e4', // x
+  royalBlue: '#496ed9',
+  azure: '#3486c2',
+  teal: '#409ea6',
+  seaGreen: '#35a17d',
+  shamrockGreen: '#45a160',
+  green: '#449932',
+  oliveGreen: '#73ac37',
+  yellowGreen: '#8fac38', // x
+  mustard: '#ac961f',
+  orange: '#ec9512',
+  redOrange: '#ec8013',
+  rust: '#cc6733',
+  tomatoRed: '#cd4d34',
+};
