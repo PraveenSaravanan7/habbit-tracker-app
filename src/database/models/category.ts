@@ -2,7 +2,7 @@ import glyphmaps from 'react-native-vector-icons/glyphmaps/MaterialCommunityIcon
 import database from '../database';
 import COLLECTION from '../collections';
 
-export interface ICategory {
+export interface ICategory extends Partial<LokiObj> {
   id: string;
   name: string;
   icon: keyof typeof glyphmaps;

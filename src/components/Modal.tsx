@@ -8,7 +8,6 @@ export interface IModal {
   children: JSX.Element;
   placeContentAtBottom?: boolean;
   width?: DimensionValue;
-  height?: DimensionValue;
 }
 
 export const Modal = ({
@@ -17,7 +16,6 @@ export const Modal = ({
   children,
   placeContentAtBottom,
   width = '100%',
-  height = 'auto',
 }: IModal) => {
   const {theme} = useTheme();
 
@@ -37,10 +35,7 @@ export const Modal = ({
           placeContentAtBottom && styles.placeContentAtBottom,
         ]}>
         <View
-          style={[
-            styles.modalView,
-            {shadowColor: theme.colors.text, width, height},
-          ]}>
+          style={[styles.modalView, {shadowColor: theme.colors.text, width}]}>
           {children}
         </View>
       </View>

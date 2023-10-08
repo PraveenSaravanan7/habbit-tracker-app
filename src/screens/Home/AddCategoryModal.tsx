@@ -11,30 +11,47 @@ import {v4 as uuid} from 'uuid';
 interface IAddCategoryModal {
   isOpen: boolean;
   updateVisibility: (visibility: boolean) => void;
-  addCategory: (category: ICategory) => void;
+  upsertCategory: (category: ICategory) => void;
+  deleteCategory: (category: ICategory) => void;
+  categoryToUpdate: ICategory | null;
 }
 
 export const AddCategoryModal = ({
   isOpen,
   updateVisibility,
-  addCategory,
+  upsertCategory,
+  deleteCategory,
+  categoryToUpdate,
 }: IAddCategoryModal) => {
   const {theme} = useTheme();
 
-  const [category, setCategory] = useState<ICategory>({
-    id: uuid(),
-    color: commonColors.green,
-    icon: 'apps',
-    name: 'New Category',
-    isCustom: true,
-  });
+  const [category, setCategory] = useState<ICategory>(
+    categoryToUpdate || {
+      id: uuid(),
+      color: commonColors.green,
+      icon: 'apps',
+      name: 'New Category',
+      isCustom: true,
+    },
+  );
 
   const [editText, setEditText] = useState(false);
   const [editIcon, setEditIcon] = useState(false);
   const [editColor, setEditColor] = useState(false);
+  const [isDeleteModelOpen, setIsDeleteModelOpen] = useState(false);
 
   const createCategory = () => {
-    addCategory(category);
+    upsertCategory(category);
+    updateVisibility(false);
+  };
+
+  const updateCategory = (updatedCategory: ICategory) => {
+    upsertCategory(updatedCategory);
+    updateVisibility(false);
+  };
+
+  const deleteIt = () => {
+    deleteCategory(category);
     updateVisibility(false);
   };
 
@@ -76,6 +93,7 @@ export const AddCategoryModal = ({
               </View>
             </View>
           </View>
+
           <Pressable
             style={[styles.infoContainer, {borderTopColor}]}
             onPress={() => setEditText(true)}>
@@ -88,6 +106,7 @@ export const AddCategoryModal = ({
               Category name
             </TextContent>
           </Pressable>
+
           <Pressable
             style={[styles.infoContainer, {borderTopColor}]}
             onPress={() => setEditIcon(true)}>
@@ -100,6 +119,7 @@ export const AddCategoryModal = ({
               Category icon
             </TextContent>
           </Pressable>
+
           <Pressable
             style={[styles.infoContainer, {borderTopColor}]}
             onPress={() => setEditColor(true)}>
@@ -112,18 +132,37 @@ export const AddCategoryModal = ({
               Category color
             </TextContent>
           </Pressable>
-          <View style={[styles.actionsContainer, {borderTopColor}]}>
+
+          {Boolean(categoryToUpdate) && (
             <Pressable
-              onPress={createCategory}
-              style={[
-                styles.button,
-                {backgroundColor: theme.colors.surface[100]},
-              ]}>
-              <TextContent style={[styles.buttonText, {color: category.color}]}>
-                CREATE CATEGORY
+              style={[styles.infoContainer, {borderTopColor}]}
+              onPress={() => setIsDeleteModelOpen(true)}>
+              <MaterialCommunityIcons
+                name="trash-can-outline"
+                color={theme.colors.disabledText}
+                size={20}
+              />
+              <TextContent style={[styles.infoContainerText]}>
+                Delete Category
               </TextContent>
             </Pressable>
-          </View>
+          )}
+
+          {!categoryToUpdate && (
+            <View style={[styles.actionsContainer, {borderTopColor}]}>
+              <Pressable
+                onPress={createCategory}
+                style={[
+                  styles.button,
+                  {backgroundColor: theme.colors.surface[100]},
+                ]}>
+                <TextContent
+                  style={[styles.buttonText, {color: category.color}]}>
+                  CREATE CATEGORY
+                </TextContent>
+              </Pressable>
+            </View>
+          )}
         </View>
       </Modal>
 
@@ -134,7 +173,8 @@ export const AddCategoryModal = ({
             setEditText(visibility);
           }}
           updateName={name => {
-            setCategory(prev => ({...prev, name}));
+            if (categoryToUpdate) updateCategory({...category, name});
+            else setCategory(prev => ({...prev, name}));
           }}
           name={category.name}
         />
@@ -147,7 +187,8 @@ export const AddCategoryModal = ({
             setEditColor(visibility);
           }}
           updateColor={color => {
-            setCategory(prev => ({...prev, color}));
+            if (categoryToUpdate) updateCategory({...category, color});
+            else setCategory(prev => ({...prev, color}));
           }}
         />
       )}
@@ -159,8 +200,19 @@ export const AddCategoryModal = ({
             setEditIcon(visibility);
           }}
           updateIcon={icon => {
-            setCategory(prev => ({...prev, icon}));
+            if (categoryToUpdate) updateCategory({...category, icon});
+            else setCategory(prev => ({...prev, icon}));
           }}
+        />
+      )}
+
+      {isDeleteModelOpen && (
+        <DeleteCategory
+          isOpen={isDeleteModelOpen}
+          updateVisibility={visibility => {
+            setIsDeleteModelOpen(visibility);
+          }}
+          deleteId={deleteIt}
         />
       )}
     </>
@@ -271,6 +323,7 @@ const EditColor = ({isOpen, updateVisibility, updateColor}: IEditColor) => {
         <ScrollView contentContainerStyle={[styles.scrollContainer]}>
           {Object.values(commonColors).map(backgroundColor => (
             <Pressable
+              key={backgroundColor}
               style={[styles.colorContainer]}
               onPress={() => onOk(backgroundColor)}>
               <View style={[styles.colorCircle, {backgroundColor}]} />
@@ -329,6 +382,7 @@ const EditIcon = ({isOpen, updateVisibility, updateIcon}: IEditIcon) => {
         <ScrollView contentContainerStyle={[styles.scrollContainer]}>
           {icons.map(icon => (
             <Pressable
+              key={icon}
               style={[styles.colorContainer]}
               onPress={() => onOk(icon)}>
               <MaterialCommunityIcons name={icon} size={42} />
@@ -347,6 +401,71 @@ const EditIcon = ({isOpen, updateVisibility, updateIcon}: IEditIcon) => {
               {backgroundColor: theme.colors.surface[100]},
             ]}>
             <TextContent style={[styles.buttonText]}>CANCEL</TextContent>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+interface IDeleteCategory {
+  isOpen: boolean;
+  updateVisibility: (visibility: boolean) => void;
+  deleteId: () => void;
+}
+
+const DeleteCategory = ({
+  isOpen,
+  updateVisibility,
+  deleteId,
+}: IDeleteCategory) => {
+  const {theme} = useTheme();
+
+  const onNo = () => {
+    updateVisibility(false);
+  };
+
+  const onYes = () => {
+    deleteId();
+    updateVisibility(false);
+  };
+
+  const color = commonColors.red;
+
+  return (
+    <Modal width={'80%'} isVisible={isOpen} updateVisibility={updateVisibility}>
+      <View
+        style={[
+          styles.containerEdit,
+          {backgroundColor: theme.colors.surface[100]},
+        ]}>
+        <View style={[styles.nameTextInputContainer]}>
+          <View>
+            <TextContent style={[styles.deleteQuestion, {color}]}>
+              Delete category?
+            </TextContent>
+          </View>
+        </View>
+        <View
+          style={[
+            styles.actionsContainer,
+            {borderTopColor: theme.colors.surface[200]},
+          ]}>
+          <Pressable
+            onPress={onYes}
+            style={[
+              styles.button,
+              {backgroundColor: theme.colors.surface[100]},
+            ]}>
+            <TextContent style={[styles.buttonText, {color}]}>YES</TextContent>
+          </Pressable>
+          <Pressable
+            onPress={onNo}
+            style={[
+              styles.button,
+              {backgroundColor: theme.colors.surface[100]},
+            ]}>
+            <TextContent style={[styles.buttonText]}>NO</TextContent>
           </Pressable>
         </View>
       </View>
@@ -434,6 +553,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   titleText: {fontFamily: 'Inter-Medium', fontSize: 14},
+  deleteQuestion: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
 
 const icons: ICategory['icon'][] = [

@@ -13,13 +13,39 @@ export const Category = () => {
   const [customCategories, setCustomCategories] = useState<ICategory[]>([]);
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [editCategory, setEditCategory] = useState<ICategory | null>(null);
 
-  const updateAddCategoryModalVisibility = (visibility: boolean) =>
+  const updateAddCategoryModalVisibility = (visibility: boolean) => {
+    if (!visibility && editCategory) setEditCategory(null);
+
     setIsAddCategoryOpen(visibility);
+  };
 
   const addCategory = (category: ICategory) => {
     setCustomCategories(prev => [...prev, category]);
     categoryModel.insertOne(category);
+  };
+
+  const updateCategory = (category: ICategory) => {
+    // if (!editCategory) return;
+    // setCustomCategories(prev => [...prev, category]);
+    categoryModel.updateWhere(
+      data => data.id === category?.id,
+      data => {
+        data.color = category.color;
+        data.icon = category.icon;
+        data.name = category.name;
+
+        return data;
+      },
+    );
+  };
+
+  const deleteCategory = (category: ICategory) => {
+    categoryModel.remove(category.$loki || 0);
+    setCustomCategories(prev =>
+      [...prev].filter(cand => cand.id !== category.id),
+    );
   };
 
   useLayoutEffect(() => {
@@ -96,7 +122,14 @@ export const Category = () => {
             contentContainerStyle={[styles.listContainer]}
             showsHorizontalScrollIndicator={false}>
             {customCategories.map(category => (
-              <Item category={category} key={category.id} />
+              <Pressable
+                key={category.id}
+                onPress={() => {
+                  setEditCategory(category);
+                  updateAddCategoryModalVisibility(true);
+                }}>
+                <Item category={category} />
+              </Pressable>
             ))}
           </ScrollView>
         )}
@@ -111,7 +144,9 @@ export const Category = () => {
         <AddCategoryModal
           isOpen={isAddCategoryOpen}
           updateVisibility={updateAddCategoryModalVisibility}
-          addCategory={addCategory}
+          upsertCategory={editCategory ? updateCategory : addCategory}
+          categoryToUpdate={editCategory}
+          deleteCategory={deleteCategory}
         />
       )}
     </>
