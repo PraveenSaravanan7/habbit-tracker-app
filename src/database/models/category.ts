@@ -10,6 +10,7 @@ export interface ICategory extends Partial<LokiObj> {
   isCustom?: boolean;
 }
 
-const categoryModel = database.getCollection<ICategory>(COLLECTION.CATEGORIES);
+const getCategoryModel = () =>
+  database.getCollection<ICategory>(COLLECTION.CATEGORIES);
 
-export default categoryModel;
+export default getCategoryModel;

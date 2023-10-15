@@ -1,6 +1,6 @@
 import React, {useLayoutEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
-import categoryModel, {ICategory} from '../../database/models/category';
+import getCategoryModel, {ICategory} from '../../database/models/category';
 import {TextContent} from '../../components/TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../../ThemeProvider';
@@ -8,6 +8,7 @@ import {AddCategoryModal} from './AddCategoryModal';
 
 export const Category = () => {
   const {theme} = useTheme();
+  const categoryModel = getCategoryModel();
 
   const [defaultCategories, setDefaultCategories] = useState<ICategory[]>([]);
   const [customCategories, setCustomCategories] = useState<ICategory[]>([]);
@@ -61,7 +62,7 @@ export const Category = () => {
 
     setDefaultCategories(defaultItems);
     setCustomCategories(customItems);
-  }, []);
+  }, [categoryModel]);
 
   // eslint-disable-next-line react/no-unstable-nested-components
   const Item = ({category}: {category: ICategory}) => (

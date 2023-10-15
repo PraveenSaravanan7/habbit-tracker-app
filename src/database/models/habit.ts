@@ -1,4 +1,7 @@
-enum HABIT_TYPES {
+import COLLECTION from '../collections';
+import database from '../database';
+
+export enum HABIT_TYPES {
   YES_OR_NO,
   NUMERIC,
   TIMER,
@@ -102,3 +105,7 @@ export type THabit =
   | INumericHabit
   | ITimerHabit
   | IYesOrNoHabit;
+
+const getHabitModel = database.getCollection<THabit>(COLLECTION.HABITS);
+
+export default getHabitModel;

@@ -6,6 +6,7 @@ import {v4 as uuid} from 'uuid';
 import {commonColors} from '../../themes';
 
 const migration = () => {
+  console.log('-- running data migration');
   initHabits();
   initCategories();
 
@@ -19,6 +20,7 @@ const initHabits = () => {
 };
 
 const initCategories = () => {
+  console.log('init', database.getCollection(COLLECTION.CATEGORIES));
   if (database.getCollection(COLLECTION.CATEGORIES)) return;
 
   const collection = database.addCollection(COLLECTION.CATEGORIES);
