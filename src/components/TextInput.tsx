@@ -10,15 +10,17 @@ import {
 import {useTheme} from '../../ThemeProvider';
 // import {Icon} from 'react-native-elements';
 
-interface MaterialUIInputProps {
+interface ITextInputProps {
   label: string;
-  placeholder: string;
+  placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
   // icon?: string | null;
   error?: boolean;
   errorMessage?: string;
+  autoFocus?: boolean;
+  labelBackgroundColor?: string;
 }
 
 export const TextInput = ({
@@ -30,7 +32,9 @@ export const TextInput = ({
   //   icon = null,
   error = false,
   errorMessage = '',
-}: MaterialUIInputProps) => {
+  autoFocus = false,
+  labelBackgroundColor,
+}: ITextInputProps) => {
   const {theme} = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
@@ -66,7 +70,7 @@ export const TextInput = ({
           styles.label,
           {
             color: labelColor,
-            backgroundColor: theme.colors.background,
+            backgroundColor: labelBackgroundColor || theme.colors.background,
             zIndex: labelPosition.interpolate({
               inputRange: [0, 1],
               outputRange: [0, 1],
@@ -115,6 +119,7 @@ export const TextInput = ({
             secureTextEntry={secureTextEntry}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            autoFocus={autoFocus}
           />
         </View>
         {error && <Text style={styles.errorText}>{errorMessage}</Text>}

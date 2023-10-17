@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, TextInput, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {Modal} from '../../components/Modal';
 import {TextContent} from '../../components/TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,6 +7,7 @@ import {useTheme} from '../../../ThemeProvider';
 import {ICategory} from '../../database/models/category';
 import {commonColors} from '../../../themes';
 import {v4 as uuid} from 'uuid';
+import {TextInput} from '../../components/TextInput';
 
 interface IAddCategoryModal {
   isOpen: boolean;
@@ -247,19 +248,12 @@ const EditText = ({isOpen, updateVisibility, updateName, name}: IEditText) => {
         ]}>
         <View style={[styles.nameTextInputContainer]}>
           <View>
-            <TextContent style={[styles.previewContainerText]}>
-              Category name
-            </TextContent>
-          </View>
-          <View>
             <TextInput
-              style={[
-                styles.nameTextInput,
-                {borderColor: theme.colors.primary[100]},
-              ]}
+              label="Category name"
               autoFocus={true}
               onChangeText={text => setListName(text)}
-              defaultValue={name}
+              value={name}
+              labelBackgroundColor={theme.colors.surface[100]}
             />
           </View>
         </View>

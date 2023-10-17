@@ -20,7 +20,6 @@ const initHabits = () => {
 };
 
 const initCategories = () => {
-  console.log('init', database.getCollection(COLLECTION.CATEGORIES));
   if (database.getCollection(COLLECTION.CATEGORIES)) return;
 
   const collection = database.addCollection(COLLECTION.CATEGORIES);
