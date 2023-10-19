@@ -7,14 +7,22 @@ import {useNavigator} from '../../../NavigationUtils';
 import {SelectCategory} from './SelectCategory';
 import {ICategory} from '../../database/models/category';
 import {SelectHabitType} from './SelectHabitType';
-import {HABIT_TYPES} from '../../database/models/habit';
+import {
+  COMPARISON_TYPE,
+  HABIT_TYPES,
+  REPEAT_TYPE,
+  THabit,
+} from '../../database/models/habit';
 import {Description} from './Description';
+import {SelectRepetition} from './SelectRepetition';
+import {SelectStartDate} from './SelectStartDate';
 
 enum SCREENS {
-  CATEGORY = 1,
-  PROGRESS,
+  SELECT_CATEGORY = 1,
+  SELECT_HABIT_TYPE,
   DEFINE,
-  REPEAT,
+  SELECT_REPEAT_CONFIG,
+  SELECT_START_DATE,
 }
 
 export const Add = () => {
@@ -24,10 +32,31 @@ export const Add = () => {
 
   const backgroundColor = theme.colors.surface[100];
 
-  const [activeScreen, setActiveScreen] = useState(SCREENS.CATEGORY);
+  const [activeScreen, setActiveScreen] = useState(SCREENS.SELECT_CATEGORY);
 
   const [category, setCategory] = useState<ICategory>();
-  const [habitType, setHabitType] = useState<HABIT_TYPES>();
+  const [habitType, setHabitType] = useState<HABIT_TYPES>(
+    HABIT_TYPES.YES_OR_NO,
+  );
+  const [nameTextInput, setNameTextInput] = useState('');
+  const [description, setDescription] = useState('');
+  const [goal, setGoal] = useState<number>();
+  const [unit, setUnit] = useState<string>('');
+  const [compare, setCompare] = useState<COMPARISON_TYPE>(
+    COMPARISON_TYPE.AT_LEAST,
+  );
+  const [repeatConfig, setRepeatConfig] = useState<THabit['repeatConfig']>({
+    repeatType: REPEAT_TYPE.EVERY_DAY,
+    days: undefined,
+  });
+
+  const updateName = (name: string) => setNameTextInput(name);
+  const updateDescription = (val: string) => setDescription(val);
+  const updateGoal = (val: number) => setGoal(val);
+  const updateUnit = (val: string) => setUnit(val);
+  const updateCompare = (val: COMPARISON_TYPE) => setCompare(val);
+  const updateRepeatConfig = (val: THabit['repeatConfig']) =>
+    setRepeatConfig(val);
 
   const onSelectCategory = (selectedCategory: ICategory) => {
     setCategory(selectedCategory);
@@ -43,59 +72,97 @@ export const Add = () => {
 
   const onBack = () => {
     switch (activeScreen) {
-      case SCREENS.CATEGORY:
+      case SCREENS.SELECT_CATEGORY:
         goBack();
         break;
 
-      case SCREENS.PROGRESS:
-        setActiveScreen(SCREENS.CATEGORY);
+      case SCREENS.SELECT_HABIT_TYPE:
+        setHabitType(undefined);
+        setActiveScreen(SCREENS.SELECT_CATEGORY);
         break;
 
       case SCREENS.DEFINE:
-        setActiveScreen(SCREENS.PROGRESS);
+        setNameTextInput('');
+        setDescription('');
+        setGoal(undefined);
+        setUnit('');
+        setCompare(COMPARISON_TYPE.AT_LEAST);
+        setActiveScreen(SCREENS.SELECT_HABIT_TYPE);
         break;
 
-      case SCREENS.REPEAT:
+      case SCREENS.SELECT_REPEAT_CONFIG:
+        setRepeatConfig({
+          repeatType: REPEAT_TYPE.EVERY_DAY,
+          days: undefined,
+        });
         setActiveScreen(SCREENS.DEFINE);
+        break;
+
+      case SCREENS.SELECT_START_DATE:
+        setActiveScreen(SCREENS.SELECT_REPEAT_CONFIG);
         break;
     }
   };
 
   const onNext = () => {
     switch (activeScreen) {
-      case SCREENS.CATEGORY:
-        setActiveScreen(SCREENS.PROGRESS);
+      case SCREENS.SELECT_CATEGORY:
+        setActiveScreen(SCREENS.SELECT_HABIT_TYPE);
         break;
 
-      case SCREENS.PROGRESS:
+      case SCREENS.SELECT_HABIT_TYPE:
         setActiveScreen(SCREENS.DEFINE);
         break;
 
       case SCREENS.DEFINE:
-        setActiveScreen(SCREENS.REPEAT);
+        setActiveScreen(SCREENS.SELECT_REPEAT_CONFIG);
         break;
 
-      case SCREENS.REPEAT:
+      case SCREENS.SELECT_REPEAT_CONFIG:
+        setActiveScreen(SCREENS.SELECT_START_DATE);
+        break;
+
+      case SCREENS.SELECT_START_DATE:
         onSave();
         break;
     }
   };
 
   const showEmptyButton =
-    activeScreen === SCREENS.CATEGORY || activeScreen === SCREENS.PROGRESS;
+    activeScreen === SCREENS.SELECT_CATEGORY ||
+    activeScreen === SCREENS.SELECT_HABIT_TYPE;
 
   return (
     <>
       <ScrollView style={[styles.container]}>
-        {activeScreen === SCREENS.CATEGORY && (
+        {activeScreen === SCREENS.SELECT_CATEGORY && (
           <SelectCategory onSelectCategory={onSelectCategory} />
         )}
-        {activeScreen === SCREENS.PROGRESS && (
+        {activeScreen === SCREENS.SELECT_HABIT_TYPE && (
           <SelectHabitType onSelectHabitType={onSelectHabitType} />
         )}
         {activeScreen === SCREENS.DEFINE && (
-          <Description habitType={habitType || HABIT_TYPES.YES_OR_NO} />
+          <Description
+            habitType={habitType}
+            name={nameTextInput}
+            updateName={updateName}
+            description={description}
+            updateDescription={updateDescription}
+            goal={goal}
+            updateGoal={updateGoal}
+            unit={unit}
+            updateUnit={updateUnit}
+            compare={compare}
+            updateCompare={updateCompare}
+          />
         )}
+        {activeScreen === SCREENS.SELECT_REPEAT_CONFIG && (
+          <SelectRepetition
+            repeatConfig={repeatConfig}
+            updateRepeatConfig={updateRepeatConfig}
+          />
+        )}
+        {activeScreen === SCREENS.SELECT_START_DATE && <SelectStartDate />}
       </ScrollView>
       <View
         style={[
@@ -109,7 +176,7 @@ export const Add = () => {
         <Pressable onPress={onBack} style={[styles.button]}>
           <TextContent>
             <Text style={[styles.buttonText]}>
-              {activeScreen === SCREENS.CATEGORY ? 'CANCEL' : 'BACK'}
+              {activeScreen === SCREENS.SELECT_CATEGORY ? 'CANCEL' : 'BACK'}
             </Text>
           </TextContent>
         </Pressable>
@@ -120,7 +187,7 @@ export const Add = () => {
               style={[
                 styles.ring,
                 {borderColor: theme.colors.primary[100]},
-                i <= activeScreen && {
+                i < activeScreen && {
                   backgroundColor: theme.colors.primary[100],
                 },
               ]}
@@ -133,7 +200,7 @@ export const Add = () => {
           <Pressable onPress={onNext} style={[styles.button]}>
             <TextContent>
               <Text style={[styles.buttonText]}>
-                {activeScreen === SCREENS.REPEAT ? 'SAVE' : 'NEXT'}
+                {activeScreen === SCREENS.SELECT_START_DATE ? 'SAVE' : 'NEXT'}
               </Text>
             </TextContent>
           </Pressable>

@@ -3,6 +3,7 @@ import {Modal, Pressable, StyleSheet, View} from 'react-native';
 import {TextContent} from './TextContent';
 import {useTheme} from '../../ThemeProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Radio} from './Radio';
 
 interface ISelectInputProps {
   list: string[];
@@ -56,28 +57,7 @@ export const Select = ({list, value, flex, onSelect}: ISelectInputProps) => {
                   setIsOpen(false);
                 }}>
                 <TextContent style={styles.itemText}>{item}</TextContent>
-                <View
-                  style={[
-                    styles.radio,
-                    {
-                      borderColor:
-                        item === value
-                          ? theme.colors.primary[100]
-                          : theme.colors.disabledText,
-                    },
-                  ]}>
-                  <View
-                    style={[
-                      styles.radioInner,
-                      {
-                        backgroundColor:
-                          item === value
-                            ? theme.colors.primary[100]
-                            : theme.colors.disabledText,
-                      },
-                    ]}
-                  />
-                </View>
+                <Radio selected={value === item} />
               </Pressable>
             ))}
           </View>

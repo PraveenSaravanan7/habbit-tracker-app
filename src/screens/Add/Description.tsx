@@ -1,34 +1,40 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Title} from './Title';
 import {TextInput} from '../../components/TextInput';
 import {TextContent} from '../../components/TextContent';
 import {useTheme} from '../../../ThemeProvider';
-import {HABIT_TYPES} from '../../database/models/habit';
+import {COMPARISON_TYPE, HABIT_TYPES} from '../../database/models/habit';
 import {Select} from '../../components/Select';
 
 interface IDescriptionProps {
   habitType: HABIT_TYPES;
+  name: string;
+  updateName: (val: string) => void;
+  description: string;
+  updateDescription: (val: string) => void;
+  goal?: number;
+  updateGoal: (val: number) => void;
+  unit?: string;
+  updateUnit: (val: string) => void;
+  compare: COMPARISON_TYPE;
+  updateCompare: (val: COMPARISON_TYPE) => void;
 }
 
-enum COMPARE {
-  AT_LEAST = 'At least',
-  LESS_THAN = 'Less than',
-  EXACTLY = 'Exactly',
-  ANY_VALUE = 'Any value',
-}
-
-export const Description = ({habitType}: IDescriptionProps) => {
+export const Description = ({
+  habitType,
+  compare,
+  description,
+  name,
+  updateCompare,
+  updateDescription,
+  updateGoal,
+  updateName,
+  updateUnit,
+  goal,
+  unit,
+}: IDescriptionProps) => {
   const {theme} = useTheme();
-
-  const [nameTextInput, setNameTextInput] = useState('');
-  const [description, setDescription] = useState('');
-  const [goal, setGoal] = useState<number>();
-  const [unit, setUnit] = useState<string>();
-  const [compare, setCompare] = useState<COMPARE>(COMPARE.AT_LEAST);
-
-  const updateName = (name: string) => setNameTextInput(name);
-  const updateDescription = (name: string) => setDescription(name);
 
   const exampleText = (() => {
     if (HABIT_TYPES.NUMERIC === habitType)
@@ -47,7 +53,7 @@ export const Description = ({habitType}: IDescriptionProps) => {
         <TextInput
           label="Habit"
           onChangeText={updateName}
-          value={nameTextInput}
+          value={name}
           placeholder=""
         />
         {habitType === HABIT_TYPES.NUMERIC && (
@@ -55,9 +61,9 @@ export const Description = ({habitType}: IDescriptionProps) => {
             compare={compare}
             goal={goal}
             unit={unit}
-            updateCompare={val => setCompare(val)}
-            updateGoal={val => setGoal(val)}
-            updateUnit={val => setUnit(val)}
+            updateCompare={updateCompare}
+            updateGoal={updateGoal}
+            updateUnit={updateUnit}
           />
         )}
         <View>
@@ -78,8 +84,8 @@ export const Description = ({habitType}: IDescriptionProps) => {
 };
 
 interface INumericOptionsProps {
-  compare: COMPARE;
-  updateCompare: (compare: COMPARE) => void;
+  compare: COMPARISON_TYPE;
+  updateCompare: (compare: COMPARISON_TYPE) => void;
   goal?: number;
   updateGoal: (goal: number) => void;
   unit?: string;
@@ -98,9 +104,9 @@ const NumericOptions = ({
     <View style={[styles.items]}>
       <Select
         flex={1}
-        onSelect={val => updateCompare(val as COMPARE)}
+        onSelect={val => updateCompare(val as COMPARISON_TYPE)}
         value={compare}
-        list={Object.values(COMPARE)}
+        list={Object.values(COMPARISON_TYPE)}
       />
       <TextInput
         flex={1}

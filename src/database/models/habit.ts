@@ -8,6 +8,13 @@ export enum HABIT_TYPES {
   CHECKLIST,
 }
 
+export enum COMPARISON_TYPE {
+  AT_LEAST = 'At least',
+  LESS_THAN = 'Less than',
+  EXACTLY = 'Exactly',
+  ANY_VALUE = 'Any value',
+}
+
 export enum REPEAT_TYPE {
   EVERY_DAY,
   DAY_OF_THE_MONTH,
@@ -64,7 +71,7 @@ interface IRepeatConfig<
   Days extends DAY_OF_THE_WEEK[] | DAY_OF_THE_MONTH[] | Date[] | undefined,
 > {
   repeatType: RepeatType;
-  days?: Days;
+  days: Days;
 }
 
 interface IHabitBase<
