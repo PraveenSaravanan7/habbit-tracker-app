@@ -6,14 +6,14 @@ import {
   StyleSheet,
   Animated,
   Easing,
+  KeyboardTypeOptions,
 } from 'react-native';
 import {useTheme} from '../../ThemeProvider';
-// import {Icon} from 'react-native-elements';
 
 interface ITextInputProps {
-  label: string;
+  label?: string;
   placeholder?: string;
-  value: string;
+  value?: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
   // icon?: string | null;
@@ -21,6 +21,8 @@ interface ITextInputProps {
   errorMessage?: string;
   autoFocus?: boolean;
   labelBackgroundColor?: string;
+  keyboardType?: KeyboardTypeOptions;
+  flex?: number;
 }
 
 export const TextInput = ({
@@ -34,6 +36,8 @@ export const TextInput = ({
   errorMessage = '',
   autoFocus = false,
   labelBackgroundColor,
+  keyboardType,
+  flex,
 }: ITextInputProps) => {
   const {theme} = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -59,12 +63,17 @@ export const TextInput = ({
     ? theme.colors.primary[100]
     : theme.colors.disabledText;
 
+  const handleOnChangeText = (text: string) => {
+    onChangeText(text);
+    moveLabel();
+  };
+
   useEffect(() => {
     moveLabel();
   }, [isFocused, moveLabel]);
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, {flex}]}>
       <Animated.Text
         style={[
           styles.label,
@@ -112,14 +121,12 @@ export const TextInput = ({
             style={styles.input}
             placeholder={placeholder}
             defaultValue={value}
-            onChangeText={text => {
-              onChangeText(text);
-              moveLabel();
-            }}
+            onChangeText={handleOnChangeText}
             secureTextEntry={secureTextEntry}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             autoFocus={autoFocus}
+            keyboardType={keyboardType}
           />
         </View>
         {error && <Text style={styles.errorText}>{errorMessage}</Text>}
@@ -129,7 +136,7 @@ export const TextInput = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {marginTop: 8},
+  wrapper: {marginTop: 0},
   container: {
     // marginBottom: 20,
     borderWidth: 1,

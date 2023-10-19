@@ -93,7 +93,9 @@ export const Add = () => {
         {activeScreen === SCREENS.PROGRESS && (
           <SelectHabitType onSelectHabitType={onSelectHabitType} />
         )}
-        {activeScreen === SCREENS.DEFINE && <Description />}
+        {activeScreen === SCREENS.DEFINE && (
+          <Description habitType={habitType || HABIT_TYPES.YES_OR_NO} />
+        )}
       </ScrollView>
       <View
         style={[
