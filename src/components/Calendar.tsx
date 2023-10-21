@@ -7,13 +7,18 @@ import moment, {Moment} from 'moment';
 import {Modal} from './Modal';
 
 export interface ICalendar {
-  selectedDate: Moment;
+  selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
+  startDate?: Moment;
 }
 
 const dateFormat = 'MMMM YYYY';
 
-export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
+export const Calendar = ({
+  selectedDate,
+  updateCurrentDate,
+  startDate,
+}: ICalendar) => {
   const {theme} = useTheme();
 
   const [month, setMonth] = useState(moment(selectedDate).startOf('month'));
@@ -25,7 +30,7 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
     setMonth(prev => moment(prev).add(noOfYear, 'years'));
 
   useEffect(() => {
-    if (selectedDate.month() !== month.month())
+    if (selectedDate?.month() !== month.month())
       setMonth(moment(selectedDate).startOf('month'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
@@ -38,6 +43,7 @@ export const Calendar = ({selectedDate, updateCurrentDate}: ICalendar) => {
         month={month}
         selectedDate={selectedDate}
         updateCurrentDate={updateCurrentDate}
+        startDate={startDate}
       />
     </View>
   );
@@ -198,10 +204,12 @@ const Grid = ({
   month,
   selectedDate,
   updateCurrentDate,
+  startDate,
 }: {
   month: Moment;
-  selectedDate: Moment;
+  selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
+  startDate?: Moment;
 }) => {
   const {theme} = useTheme();
 
@@ -230,6 +238,7 @@ const Grid = ({
         month={month}
         selectedDate={selectedDate}
         updateCurrentDate={updateCurrentDate}
+        startDate={startDate}
       />
     </>
   );
@@ -239,26 +248,29 @@ const Days = ({
   month,
   selectedDate,
   updateCurrentDate,
+  startDate: startDateProp,
 }: {
   month: Moment;
-  selectedDate: Moment;
+  selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
+  startDate?: Moment;
 }) => {
   const {theme} = useTheme();
 
   const Item = useCallback(
     ({day}: {day: Moment}) => {
-      const backgroundColor = selectedDate.isSame(day)
+      const isDisabled = startDateProp ? day.isBefore(startDateProp) : false;
+      const backgroundColor = selectedDate?.isSame(day)
         ? theme.colors.primary[100]
         : theme.colors.surface[200];
-      const opacity = day.month() === month.month() ? 1 : 0.25;
-      const fontFamily = selectedDate.isSame(day)
+      const opacity = day.month() === month.month() && !isDisabled ? 1 : 0.25;
+      const fontFamily = selectedDate?.isSame(day)
         ? 'Inter-Bold'
         : 'Inter-Regular';
 
       return (
         <Pressable
-          disabled={day.month() !== month.month()}
+          disabled={isDisabled || day.month() !== month.month()}
           style={[styles.dayItem, {backgroundColor, opacity}]}
           onPress={() => updateCurrentDate(day)}>
           <TextContent>
@@ -267,7 +279,7 @@ const Days = ({
         </Pressable>
       );
     },
-    [theme, month, selectedDate, updateCurrentDate],
+    [theme, month, selectedDate, updateCurrentDate, startDateProp],
   );
 
   const startDate = moment(month).subtract(month.weekday(), 'days');

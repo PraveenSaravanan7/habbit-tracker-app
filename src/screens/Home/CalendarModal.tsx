@@ -9,8 +9,9 @@ import {TextContent} from '../../components/TextContent';
 interface ICalendarModal {
   isCalendarOpen: boolean;
   updateCalendarModalVisibility: (visibility: boolean) => void;
-  currentDate: Moment;
+  currentDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
+  startDate?: Moment;
 }
 
 export const CalendarModal = ({
@@ -18,6 +19,7 @@ export const CalendarModal = ({
   updateCalendarModalVisibility,
   currentDate,
   updateCurrentDate,
+  startDate,
 }: ICalendarModal) => {
   const {theme} = useTheme();
 
@@ -41,6 +43,7 @@ export const CalendarModal = ({
         <Calendar
           selectedDate={currentDate}
           updateCurrentDate={handleUpdateDate}
+          startDate={startDate}
         />
         <View
           style={[

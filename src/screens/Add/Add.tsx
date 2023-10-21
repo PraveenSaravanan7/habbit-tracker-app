@@ -16,6 +16,7 @@ import {
 import {Description} from './Description';
 import {SelectRepetition} from './SelectRepetition';
 import {SelectStartDate} from './SelectStartDate';
+import moment from 'moment';
 
 enum SCREENS {
   SELECT_CATEGORY = 1,
@@ -49,6 +50,11 @@ export const Add = () => {
     repeatType: REPEAT_TYPE.EVERY_DAY,
     days: undefined,
   });
+  const [startDate, setStartDate] = useState(
+    moment().format('DD/MM/YY').toString(),
+  );
+  const [endDate, setEndDate] = useState('');
+  const [priority, setPriority] = useState(1);
 
   const updateName = (name: string) => setNameTextInput(name);
   const updateDescription = (val: string) => setDescription(val);
@@ -57,6 +63,9 @@ export const Add = () => {
   const updateCompare = (val: COMPARISON_TYPE) => setCompare(val);
   const updateRepeatConfig = (val: THabit['repeatConfig']) =>
     setRepeatConfig(val);
+  const updateStartDate = (date: string) => setStartDate(date);
+  const updateEndDate = (date: string) => setEndDate(date);
+  const updatePriority = (val: number) => setPriority(val);
 
   const onSelectCategory = (selectedCategory: ICategory) => {
     setCategory(selectedCategory);
@@ -77,7 +86,7 @@ export const Add = () => {
         break;
 
       case SCREENS.SELECT_HABIT_TYPE:
-        setHabitType(undefined);
+        setHabitType(HABIT_TYPES.YES_OR_NO);
         setActiveScreen(SCREENS.SELECT_CATEGORY);
         break;
 
@@ -99,6 +108,9 @@ export const Add = () => {
         break;
 
       case SCREENS.SELECT_START_DATE:
+        setStartDate(moment().format('DD/MM/YY').toString());
+        setEndDate('');
+        setPriority(1);
         setActiveScreen(SCREENS.SELECT_REPEAT_CONFIG);
         break;
     }
@@ -162,7 +174,16 @@ export const Add = () => {
             updateRepeatConfig={updateRepeatConfig}
           />
         )}
-        {activeScreen === SCREENS.SELECT_START_DATE && <SelectStartDate />}
+        {activeScreen === SCREENS.SELECT_START_DATE && (
+          <SelectStartDate
+            startDate={startDate}
+            endDate={endDate}
+            priority={priority}
+            updateEndDate={updateEndDate}
+            updatePriority={updatePriority}
+            updateStartDate={updateStartDate}
+          />
+        )}
       </ScrollView>
       <View
         style={[
@@ -199,7 +220,13 @@ export const Add = () => {
         ) : (
           <Pressable onPress={onNext} style={[styles.button]}>
             <TextContent>
-              <Text style={[styles.buttonText]}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  activeScreen === SCREENS.SELECT_START_DATE && {
+                    color: theme.colors.primary[100],
+                  },
+                ]}>
                 {activeScreen === SCREENS.SELECT_START_DATE ? 'SAVE' : 'NEXT'}
               </Text>
             </TextContent>
