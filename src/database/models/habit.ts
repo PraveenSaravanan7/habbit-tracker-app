@@ -69,7 +69,7 @@ export enum DAY_OF_THE_MONTH {
 
 interface IRepeatConfig<
   RepeatType extends REPEAT_TYPE,
-  Days extends DAY_OF_THE_WEEK[] | DAY_OF_THE_MONTH[] | Date[] | undefined,
+  Days extends DAY_OF_THE_WEEK[] | DAY_OF_THE_MONTH[] | string[] | undefined,
 > {
   repeatType: RepeatType;
   days: Days;
@@ -88,7 +88,7 @@ interface IHabitBase<
     | IRepeatConfig<REPEAT_TYPE.EVERY_DAY, undefined>
     | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_WEEK, DAY_OF_THE_WEEK[]>
     | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_MONTH, DAY_OF_THE_MONTH[]>
-    | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_YEAR, Date[]>;
+    | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_YEAR, string[]>;
   startDate: string;
   endDate?: string;
   priority: number;

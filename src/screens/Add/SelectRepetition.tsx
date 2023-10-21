@@ -10,6 +10,7 @@ import {
 import {Radio} from '../../components/Radio';
 import {TextContent} from '../../components/TextContent';
 import {useTheme} from '../../../ThemeProvider';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ISelectRepetitionProps {
   repeatConfig: THabit['repeatConfig'];
@@ -60,6 +61,38 @@ export const SelectRepetition = ({
       })}
     </View>
   );
+
+  // // eslint-disable-next-line react/no-unstable-nested-components
+  // const DateList = () => (
+  //   <View style={[styles.dateListContainer]}>
+  //     <View style={{width: '70%', rowGap: 8}}>
+  //       {repeatConfig.days?.length ? (
+  //         <View />
+  //       ) : (
+  //         <View
+  //           style={[
+  //             styles.emptyDateList,
+  //             {backgroundColor: theme.colors.surface[200]},
+  //           ]}>
+  //           <TextContent>Select at least one day</TextContent>
+  //         </View>
+  //       )}
+  //     </View>
+  //     <View>
+  //       <Pressable
+  //         style={[
+  //           styles.addButton,
+  //           {backgroundColor: theme.colors.primary[100]},
+  //         ]}>
+  //         <MaterialCommunityIcons
+  //           name="plus"
+  //           size={24}
+  //           style={{color: theme.colors.text}}
+  //         />
+  //       </Pressable>
+  //     </View>
+  //   </View>
+  // );
 
   return (
     <View style={[styles.wrapper]}>
@@ -119,7 +152,7 @@ export const SelectRepetition = ({
         {repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH && (
           <DayList />
         )}
-
+        {/* 
         <Pressable
           style={[styles.item]}
           onPress={() =>
@@ -136,6 +169,10 @@ export const SelectRepetition = ({
             Specific days of the year
           </TextContent>
         </Pressable>
+
+        {repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR && (
+          <DateList />
+        )} */}
       </View>
     </View>
   );
@@ -170,5 +207,24 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
+  },
+  dateListContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    columnGap: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButton: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  emptyDateList: {
+    width: '100%',
+    padding: 12,
+    borderRadius: 8,
   },
 });
