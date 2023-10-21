@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, View} from 'react-native';
+import {Modal, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {TextContent} from './TextContent';
 import {useTheme} from '../../ThemeProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -43,7 +43,7 @@ export const Select = ({list, value, flex, onSelect}: ISelectInputProps) => {
             styles.centeredView,
             {backgroundColor: theme.colors.transparentBackdrop},
           ]}>
-          <View
+          <ScrollView
             style={[
               styles.container,
               {backgroundColor: theme.colors.surface[100]},
@@ -60,7 +60,7 @@ export const Select = ({list, value, flex, onSelect}: ISelectInputProps) => {
                 <Radio selected={value === item} />
               </Pressable>
             ))}
-          </View>
+          </ScrollView>
         </View>
       </Modal>
     </>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  container: {width: '80%', borderRadius: 20},
+  container: {width: '80%', maxHeight: '70%', borderRadius: 20},
   item: {
     paddingHorizontal: 20,
     paddingVertical: 16,

@@ -67,6 +67,21 @@ export enum DAY_OF_THE_MONTH {
   LAST = 'Last',
 }
 
+export enum MONTHS {
+  January = 'January',
+  February = 'February',
+  March = 'March',
+  April = 'April',
+  May = 'May',
+  June = 'June',
+  July = 'July',
+  August = 'August',
+  September = 'September',
+  October = 'October',
+  November = 'November',
+  December = 'December',
+}
+
 interface IRepeatConfig<
   RepeatType extends REPEAT_TYPE,
   Days extends DAY_OF_THE_WEEK[] | DAY_OF_THE_MONTH[] | string[] | undefined,

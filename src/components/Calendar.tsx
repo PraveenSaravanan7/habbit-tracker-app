@@ -21,7 +21,9 @@ export const Calendar = ({
 }: ICalendar) => {
   const {theme} = useTheme();
 
-  const [month, setMonth] = useState(moment(selectedDate).startOf('month'));
+  const [month, setMonth] = useState(
+    moment(selectedDate || startDate).startOf('month'),
+  );
 
   const moveMonth = (noOfMonth: number) =>
     setMonth(prev => moment(prev).add(noOfMonth, 'M'));
@@ -30,7 +32,7 @@ export const Calendar = ({
     setMonth(prev => moment(prev).add(noOfYear, 'years'));
 
   useEffect(() => {
-    if (selectedDate?.month() !== month.month())
+    if (selectedDate && selectedDate.month() !== month.month())
       setMonth(moment(selectedDate).startOf('month'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
@@ -289,9 +291,7 @@ const Days = ({
   for (let i = 0; i < total; i++) {
     const y = Math.floor(i / 7);
 
-    if (!daysList[y]) {
-      daysList[y] = [];
-    }
+    if (!daysList[y]) daysList[y] = [];
 
     daysList[y].push(<Item key={i} day={moment(startDate).add(i, 'day')} />);
   }
@@ -328,7 +328,7 @@ const HorizontalMover = ({
         <MaterialCommunityIcons
           name="chevron-left"
           color={theme.colors.primary[100]}
-          size={28}
+          size={32}
         />
       </Pressable>
       <Pressable
@@ -340,7 +340,7 @@ const HorizontalMover = ({
         <MaterialCommunityIcons
           name="chevron-right"
           color={theme.colors.primary[100]}
-          size={28}
+          size={32}
         />
       </Pressable>
     </View>
