@@ -64,6 +64,7 @@ export enum DAY_OF_THE_MONTH {
   TWENTYNINE = '29',
   THIRTY = '30',
   THIRTYONE = '31',
+  LAST = 'Last',
 }
 
 interface IRepeatConfig<
