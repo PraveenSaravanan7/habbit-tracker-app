@@ -181,7 +181,7 @@ const CheckList = ({checkList, updateCheckList}: ICheckListProps) => {
               styles.emptyDateList,
               {backgroundColor: theme.colors.surface[200]},
             ]}>
-            <TextContent>Select at least one day</TextContent>
+            <TextContent>Create at least one task</TextContent>
           </Pressable>
         )}
       </View>
