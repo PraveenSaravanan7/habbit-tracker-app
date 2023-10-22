@@ -15,6 +15,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {Modal} from '../../components/Modal';
 import {Select} from '../../components/Select';
 
+/**
+ * TODO
+ * 1. Add End Date interval
+ */
+
 interface ISelectRepetitionProps {
   repeatConfig: THabit['repeatConfig'];
   updateRepeatConfig: (val: THabit['repeatConfig']) => void;

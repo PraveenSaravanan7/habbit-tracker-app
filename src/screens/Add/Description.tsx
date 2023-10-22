@@ -7,6 +7,11 @@ import {useTheme} from '../../../ThemeProvider';
 import {COMPARISON_TYPE, HABIT_TYPES} from '../../database/models/habit';
 import {Select} from '../../components/Select';
 
+/**
+ * TODO:
+ * 1. Selection timer fix
+ */
+
 interface IDescriptionProps {
   habitType: HABIT_TYPES;
   name: string;
