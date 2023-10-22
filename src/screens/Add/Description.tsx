@@ -19,6 +19,8 @@ interface IDescriptionProps {
   updateUnit: (val: string) => void;
   compare: COMPARISON_TYPE;
   updateCompare: (val: COMPARISON_TYPE) => void;
+  goalTime: string;
+  updateGoalTime: (val: string) => void;
 }
 
 export const Description = ({
@@ -33,6 +35,8 @@ export const Description = ({
   updateUnit,
   goal,
   unit,
+  goalTime,
+  updateGoalTime,
 }: IDescriptionProps) => {
   const {theme} = useTheme();
 
@@ -56,6 +60,7 @@ export const Description = ({
           value={name}
           placeholder=""
         />
+
         {habitType === HABIT_TYPES.NUMERIC && (
           <NumericOptions
             compare={compare}
@@ -66,6 +71,16 @@ export const Description = ({
             updateUnit={updateUnit}
           />
         )}
+
+        {habitType === HABIT_TYPES.TIMER && (
+          <TimerOptions
+            compare={compare}
+            goalTime={goalTime}
+            updateCompare={updateCompare}
+            updateGoalTime={updateGoalTime}
+          />
+        )}
+
         <View>
           <TextContent
             style={[{color: theme.colors.disabledText}, styles.egText]}>
@@ -80,6 +95,70 @@ export const Description = ({
         />
       </View>
     </View>
+  );
+};
+
+interface ITimerOptionsProps {
+  compare: COMPARISON_TYPE;
+  updateCompare: (compare: COMPARISON_TYPE) => void;
+  goalTime: string;
+  updateGoalTime: (goal: string) => void;
+}
+
+const TimerOptions = ({
+  compare,
+  goalTime,
+  updateCompare,
+  updateGoalTime,
+}: ITimerOptionsProps) => {
+  const [hours, minutes, seconds] = goalTime.split(':');
+
+  return (
+    <>
+      <View style={[styles.items]}>
+        <Select
+          flex={1}
+          onSelect={val => updateCompare(val as COMPARISON_TYPE)}
+          value={compare}
+          list={Object.values(COMPARISON_TYPE)}
+        />
+      </View>
+      <View style={[styles.items]}>
+        <TextInput
+          flex={2}
+          label="Hours"
+          onChangeText={hours => {
+            if (Number.isInteger(hours))
+              updateGoalTime(`${hours.padStart(2, '0')}:${minutes}:${seconds}`);
+          }}
+          value={hours}
+          keyboardType="number-pad"
+        />
+        <TextInput
+          flex={2}
+          label="Minutes"
+          onChangeText={minutes => {
+            if (Number.isInteger(minutes))
+              updateGoalTime(`${hours}:${minutes.padStart(2, '0')}:${seconds}`);
+          }}
+          value={minutes}
+          keyboardType="number-pad"
+        />
+        <TextInput
+          flex={2}
+          label="Seconds"
+          onChangeText={seconds => {
+            if (Number.isInteger(seconds))
+              updateGoalTime(`${hours}:${minutes}:${seconds.padStart(2, '0')}`);
+          }}
+          value={seconds}
+          keyboardType="number-pad"
+        />
+        <View style={styles.unitText}>
+          <TextContent>a day.</TextContent>
+        </View>
+      </View>
+    </>
   );
 };
 

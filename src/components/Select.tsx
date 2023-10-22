@@ -48,18 +48,20 @@ export const Select = ({list, value, flex, onSelect}: ISelectInputProps) => {
               styles.container,
               {backgroundColor: theme.colors.surface[100]},
             ]}>
-            {list.map(item => (
-              <Pressable
-                key={item}
-                style={[styles.item]}
-                onPress={() => {
-                  onSelect(item);
-                  setIsOpen(false);
-                }}>
-                <TextContent style={styles.itemText}>{item}</TextContent>
-                <Radio selected={value === item} />
-              </Pressable>
-            ))}
+            <View>
+              {list.map(item => (
+                <Pressable
+                  key={item}
+                  style={[styles.item]}
+                  onPress={() => {
+                    onSelect(item);
+                    setIsOpen(false);
+                  }}>
+                  <TextContent style={styles.itemText}>{item}</TextContent>
+                  <Radio selected={value === item} />
+                </Pressable>
+              ))}
+            </View>
           </ScrollView>
         </View>
       </Modal>
@@ -72,8 +74,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
   },
-  container: {width: '80%', maxHeight: '70%', borderRadius: 20},
+  container: {maxWidth: '80%', maxHeight: '70%', borderRadius: 20},
   item: {
     paddingHorizontal: 20,
     paddingVertical: 16,

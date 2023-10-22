@@ -112,11 +112,14 @@ interface IHabitBase<
 interface INumericHabit
   extends IHabitBase<
     HABIT_TYPES.NUMERIC,
-    {goalNumber: number; unitName: string}
+    {comparisonType: COMPARISON_TYPE; goalNumber: number; unitName: string}
   > {}
 
 interface ITimerHabit
-  extends IHabitBase<HABIT_TYPES.TIMER, {minutes: number}> {}
+  extends IHabitBase<
+    HABIT_TYPES.TIMER,
+    {comparisonType: COMPARISON_TYPE; duration: string}
+  > {}
 
 interface ICheckListHabit
   extends IHabitBase<HABIT_TYPES.CHECKLIST, {checkList: string[]}> {}

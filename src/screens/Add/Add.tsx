@@ -42,6 +42,7 @@ export const Add = () => {
   const [nameTextInput, setNameTextInput] = useState('');
   const [description, setDescription] = useState('');
   const [goal, setGoal] = useState<number>();
+  const [goalTime, setGoalTime] = useState('00:00:00');
   const [unit, setUnit] = useState<string>('');
   const [compare, setCompare] = useState<COMPARISON_TYPE>(
     COMPARISON_TYPE.AT_LEAST,
@@ -59,6 +60,7 @@ export const Add = () => {
   const updateName = (name: string) => setNameTextInput(name);
   const updateDescription = (val: string) => setDescription(val);
   const updateGoal = (val: number) => setGoal(val);
+  const updateGoalTime = (val: string) => setGoalTime(val);
   const updateUnit = (val: string) => setUnit(val);
   const updateCompare = (val: COMPARISON_TYPE) => setCompare(val);
   const updateRepeatConfig = (val: THabit['repeatConfig']) =>
@@ -94,6 +96,7 @@ export const Add = () => {
         setNameTextInput('');
         setDescription('');
         setGoal(undefined);
+        setGoalTime('00:00:00');
         setUnit('');
         setCompare(COMPARISON_TYPE.AT_LEAST);
         setActiveScreen(SCREENS.SELECT_HABIT_TYPE);
@@ -166,6 +169,8 @@ export const Add = () => {
             updateUnit={updateUnit}
             compare={compare}
             updateCompare={updateCompare}
+            goalTime={goalTime}
+            updateGoalTime={updateGoalTime}
           />
         )}
         {activeScreen === SCREENS.SELECT_REPEAT_CONFIG && (
