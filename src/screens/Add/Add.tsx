@@ -41,6 +41,7 @@ export const Add = () => {
   );
   const [nameTextInput, setNameTextInput] = useState('');
   const [description, setDescription] = useState('');
+  const [checkList, setCheckList] = useState<string[]>([]);
   const [goal, setGoal] = useState<number>();
   const [goalTime, setGoalTime] = useState('00:00:00');
   const [unit, setUnit] = useState<string>('');
@@ -68,6 +69,7 @@ export const Add = () => {
   const updateStartDate = (date: string) => setStartDate(date);
   const updateEndDate = (date: string) => setEndDate(date);
   const updatePriority = (val: number) => setPriority(val);
+  const updateCheckList = (val: string[]) => setCheckList(val);
 
   const onSelectCategory = (selectedCategory: ICategory) => {
     setCategory(selectedCategory);
@@ -100,6 +102,7 @@ export const Add = () => {
         setUnit('');
         setCompare(COMPARISON_TYPE.AT_LEAST);
         setActiveScreen(SCREENS.SELECT_HABIT_TYPE);
+        setCheckList([]);
         break;
 
       case SCREENS.SELECT_REPEAT_CONFIG:
@@ -171,6 +174,8 @@ export const Add = () => {
             updateCompare={updateCompare}
             goalTime={goalTime}
             updateGoalTime={updateGoalTime}
+            checkList={checkList}
+            updateCheckList={updateCheckList}
           />
         )}
         {activeScreen === SCREENS.SELECT_REPEAT_CONFIG && (
