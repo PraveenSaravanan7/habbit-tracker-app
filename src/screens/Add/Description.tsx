@@ -315,7 +315,7 @@ const TimerOptions = ({
           flex={2}
           label="Hours"
           onChangeText={hours => {
-            if (Number.isInteger(hours))
+            if (Number.isInteger(+hours))
               updateGoalTime(`${hours.padStart(2, '0')}:${minutes}:${seconds}`);
           }}
           value={hours}
@@ -325,7 +325,7 @@ const TimerOptions = ({
           flex={2}
           label="Minutes"
           onChangeText={minutes => {
-            if (Number.isInteger(minutes))
+            if (Number.isInteger(+minutes))
               updateGoalTime(`${hours}:${minutes.padStart(2, '0')}:${seconds}`);
           }}
           value={minutes}
@@ -335,7 +335,7 @@ const TimerOptions = ({
           flex={2}
           label="Seconds"
           onChangeText={seconds => {
-            if (Number.isInteger(seconds))
+            if (Number.isInteger(+seconds))
               updateGoalTime(`${hours}:${minutes}:${seconds.padStart(2, '0')}`);
           }}
           value={seconds}

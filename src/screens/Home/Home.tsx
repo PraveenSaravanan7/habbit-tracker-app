@@ -24,7 +24,9 @@ export const Home = () => {
       />
       <Footer activeTab={activeTab} updateActiveTab={updateActiveTab} />
 
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps={'handled'}>
         <View style={{marginTop: 100}}>
           {activeTab === MAIN_TABS.TODAY && (
             <Today

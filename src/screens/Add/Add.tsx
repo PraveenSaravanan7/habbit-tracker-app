@@ -1,5 +1,13 @@
 import React, {useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  View,
+} from 'react-native';
 import {TextContent} from '../../components/TextContent';
 import {useTheme} from '../../../ThemeProvider';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -32,6 +40,7 @@ export const Add = () => {
   const insets = useSafeAreaInsets();
 
   const backgroundColor = theme.colors.surface[100];
+  const defaultGoalTime = '00:00:00';
 
   const [activeScreen, setActiveScreen] = useState(SCREENS.SELECT_CATEGORY);
 
@@ -43,7 +52,7 @@ export const Add = () => {
   const [description, setDescription] = useState('');
   const [checkList, setCheckList] = useState<string[]>([]);
   const [goal, setGoal] = useState<number>();
-  const [goalTime, setGoalTime] = useState('00:00:00');
+  const [goalTime, setGoalTime] = useState(defaultGoalTime);
   const [unit, setUnit] = useState<string>('');
   const [compare, setCompare] = useState<COMPARISON_TYPE>(
     COMPARISON_TYPE.AT_LEAST,
@@ -122,7 +131,38 @@ export const Add = () => {
     }
   };
 
+  const isInValidateStep = () => {
+    switch (activeScreen) {
+      case SCREENS.DEFINE:
+        if (!nameTextInput) return 'Please enter valid habit';
+        if (habitType === HABIT_TYPES.NUMERIC && !goal)
+          return 'Please enter valid goal';
+        if (habitType === HABIT_TYPES.TIMER && goalTime === defaultGoalTime)
+          return 'Please enter valid time';
+        if (habitType === HABIT_TYPES.CHECKLIST && checkList.length === 0)
+          return 'Please add valid check lists';
+        break;
+
+      case SCREENS.SELECT_REPEAT_CONFIG:
+        if (
+          repeatConfig.repeatType !== REPEAT_TYPE.EVERY_DAY &&
+          repeatConfig.days.length === 0
+        )
+          return 'Please select days';
+        break;
+    }
+  };
+
   const onNext = () => {
+    const errorMessage = isInValidateStep();
+
+    if (errorMessage)
+      return ToastAndroid.showWithGravity(
+        errorMessage,
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+
     switch (activeScreen) {
       case SCREENS.SELECT_CATEGORY:
         setActiveScreen(SCREENS.SELECT_HABIT_TYPE);
