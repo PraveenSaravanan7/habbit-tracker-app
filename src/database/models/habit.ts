@@ -132,6 +132,6 @@ export type THabit =
   | ITimerHabit
   | IYesOrNoHabit;
 
-const getHabitModel = database.getCollection<THabit>(COLLECTION.HABITS);
+const getHabitModel = () => database.getCollection<THabit>(COLLECTION.HABITS);
 
 export default getHabitModel;

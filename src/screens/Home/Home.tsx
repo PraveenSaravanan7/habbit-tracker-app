@@ -6,6 +6,7 @@ import {Footer} from './Footer';
 import moment, {Moment} from 'moment';
 import {Today} from './Today';
 import {Category} from './Category';
+import {Habit} from './Habit';
 
 export const Home = () => {
   const [activeTab, setActiveTab] = useState(MAIN_TABS.TODAY);
@@ -35,6 +36,7 @@ export const Home = () => {
             />
           )}
           {activeTab === MAIN_TABS.CATEGORY && <Category />}
+          {activeTab === MAIN_TABS.HABIT && <Habit />}
         </View>
       </ScrollView>
     </View>

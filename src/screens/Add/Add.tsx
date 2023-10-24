@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,7 +14,7 @@ import {useNavigator} from '../../../NavigationUtils';
 import {SelectCategory} from './SelectCategory';
 import {ICategory} from '../../database/models/category';
 import {SelectHabitType} from './SelectHabitType';
-import {
+import getHabitModel, {
   COMPARISON_TYPE,
   HABIT_TYPES,
   REPEAT_TYPE,
@@ -25,6 +24,7 @@ import {Description} from './Description';
 import {SelectRepetition} from './SelectRepetition';
 import {SelectStartDate} from './SelectStartDate';
 import moment from 'moment';
+import database from '../../database/database';
 
 enum SCREENS {
   SELECT_CATEGORY = 1,
@@ -90,7 +90,34 @@ export const Add = () => {
     onNext();
   };
 
-  const onSave = () => {};
+  const onSave = () => {
+    const habitModel = getHabitModel();
+    const habit: THabit = {
+      habitName: nameTextInput,
+      habitDescription: description,
+      habitType: habitType,
+      repeatConfig,
+      category: category?.id || '',
+      startDate,
+      priority,
+      endDate,
+    };
+
+    if (habit.habitType === HABIT_TYPES.NUMERIC)
+      habit.habitConfig = {
+        comparisonType: compare,
+        goalNumber: goal || 1,
+        unitName: unit,
+      };
+    else if (habit.habitType === HABIT_TYPES.TIMER)
+      habit.habitConfig = {comparisonType: compare, duration: goalTime};
+    else if (habit.habitType === HABIT_TYPES.CHECKLIST)
+      habit.habitConfig = {checkList};
+
+    habitModel.insertOne(habit);
+
+    goBack();
+  };
 
   const onBack = () => {
     switch (activeScreen) {
