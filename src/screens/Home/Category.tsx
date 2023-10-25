@@ -103,6 +103,7 @@ export const Category = () => {
           </TextContent>
         </View>
         <ScrollView
+          keyboardShouldPersistTaps={'handled'}
           horizontal
           contentContainerStyle={[styles.listContainer]}
           showsHorizontalScrollIndicator={false}>
@@ -119,6 +120,7 @@ export const Category = () => {
         {!customCategories.length && <EmptyBanner />}
         {!!customCategories.length && (
           <ScrollView
+            keyboardShouldPersistTaps={'handled'}
             horizontal
             contentContainerStyle={[styles.listContainer]}
             showsHorizontalScrollIndicator={false}>

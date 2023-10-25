@@ -44,6 +44,7 @@ export const Select = ({list, value, flex, onSelect}: ISelectInputProps) => {
             {backgroundColor: theme.colors.transparentBackdrop},
           ]}>
           <ScrollView
+            keyboardShouldPersistTaps={'handled'}
             style={[
               styles.container,
               {backgroundColor: theme.colors.surface[100]},

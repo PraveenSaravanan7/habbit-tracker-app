@@ -16,6 +16,7 @@ import {ICategory} from '../../database/models/category';
 import {SelectHabitType} from './SelectHabitType';
 import getHabitModel, {
   COMPARISON_TYPE,
+  HABIT_MODEL_EVENT,
   HABIT_TYPES,
   REPEAT_TYPE,
   THabit,
@@ -115,6 +116,8 @@ export const Add = () => {
       habit.habitConfig = {checkList};
 
     habitModel.insertOne(habit);
+
+    database.emit(HABIT_MODEL_EVENT.ADD_HABIT); // TODO: Maybe add data arg as well
 
     goBack();
   };
@@ -219,7 +222,9 @@ export const Add = () => {
 
   return (
     <>
-      <ScrollView style={[styles.container]}>
+      <ScrollView
+        keyboardShouldPersistTaps={'handled'}
+        style={[styles.container]}>
         {activeScreen === SCREENS.SELECT_CATEGORY && (
           <SelectCategory onSelectCategory={onSelectCategory} />
         )}

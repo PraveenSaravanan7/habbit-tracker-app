@@ -314,7 +314,9 @@ const EditColor = ({isOpen, updateVisibility, updateColor}: IEditColor) => {
           ]}>
           <TextContent style={[styles.titleText]}>Category color</TextContent>
         </View>
-        <ScrollView contentContainerStyle={[styles.scrollContainer]}>
+        <ScrollView
+          keyboardShouldPersistTaps={'handled'}
+          contentContainerStyle={[styles.scrollContainer]}>
           {Object.values(commonColors).map(backgroundColor => (
             <Pressable
               key={backgroundColor}
@@ -373,7 +375,9 @@ const EditIcon = ({isOpen, updateVisibility, updateIcon}: IEditIcon) => {
           ]}>
           <TextContent style={[styles.titleText]}>Category icon</TextContent>
         </View>
-        <ScrollView contentContainerStyle={[styles.scrollContainer]}>
+        <ScrollView
+          keyboardShouldPersistTaps={'handled'}
+          contentContainerStyle={[styles.scrollContainer]}>
           {icons.map(icon => (
             <Pressable
               key={icon}
