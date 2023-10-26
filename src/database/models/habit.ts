@@ -94,6 +94,7 @@ interface IHabitBase<
   HabitType extends HABIT_TYPES,
   HabitConfig extends Record<string, string | string[] | number> | undefined,
 > {
+  id: string;
   habitType: HabitType;
   habitConfig?: HabitConfig;
   category: string;
@@ -133,7 +134,7 @@ export type THabit =
   | IYesOrNoHabit;
 
 export enum HABIT_MODEL_EVENT {
-  ADD_HABIT = 'Add habit',
+  ADD_HABIT = 'add_habit',
 }
 
 const getHabitModel = () => database.getCollection<THabit>(COLLECTION.HABITS);

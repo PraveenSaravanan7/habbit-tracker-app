@@ -26,6 +26,7 @@ import {SelectRepetition} from './SelectRepetition';
 import {SelectStartDate} from './SelectStartDate';
 import moment from 'moment';
 import database from '../../database/database';
+import {v4 as uuid} from 'uuid';
 
 enum SCREENS {
   SELECT_CATEGORY = 1,
@@ -94,6 +95,7 @@ export const Add = () => {
   const onSave = () => {
     const habitModel = getHabitModel();
     const habit: THabit = {
+      id: uuid(),
       habitName: nameTextInput,
       habitDescription: description,
       habitType: habitType,

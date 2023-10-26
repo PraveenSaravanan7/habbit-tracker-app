@@ -9,6 +9,7 @@ const migration = () => {
   console.log('-- running data migration');
   initHabits();
   initCategories();
+  initHistory();
 
   database.saveDatabase();
 };
@@ -17,6 +18,12 @@ const initHabits = () => {
   if (database.getCollection(COLLECTION.HABITS)) return;
 
   database.addCollection(COLLECTION.HABITS);
+};
+
+const initHistory = () => {
+  if (database.getCollection(COLLECTION.HISTORY)) return;
+
+  database.addCollection(COLLECTION.HISTORY);
 };
 
 const initCategories = () => {

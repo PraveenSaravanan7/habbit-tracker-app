@@ -3,9 +3,9 @@ import database from '../database';
 
 interface IHistory {
   date: string;
-  progress: {
+  habits: {
     habitId: string;
-    progress: number;
+    progress?: number | string;
     completed: boolean;
   }[];
 }

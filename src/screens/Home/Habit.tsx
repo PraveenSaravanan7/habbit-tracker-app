@@ -12,6 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import getCategoryModel, {ICategory} from '../../database/models/category';
 import {convertHexToRGBA} from '../../utils';
 import moment, {Moment} from 'moment';
+import {useHabitUpdate} from '../../hooks/useHabitUpdate';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -21,6 +22,7 @@ export const Habit = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
 
   const {theme} = useTheme();
+  const {UpdateUi, updateProgress} = useHabitUpdate();
 
   const getCategory = (habit: THabit) =>
     categories.find(category => category.id === habit.category);
@@ -58,47 +60,53 @@ export const Habit = () => {
   }, [categoryModel, habitModel]);
 
   return (
-    <View style={[styles.container]}>
-      {habits.map((habit, key) => {
-        const category = getCategory(habit);
+    <>
+      <View style={[styles.container]}>
+        {habits.map((habit, key) => {
+          const category = getCategory(habit);
 
-        if (!category) return null;
+          if (!category) return null;
 
-        return (
-          <View
-            style={[styles.item, {backgroundColor: theme.colors.surface[100]}]}
-            key={key}>
-            <View style={[styles.itemTop]}>
-              <View style={styles.habitNameContainer}>
-                <TextContent style={[styles.habitName]}>
-                  {habit.habitName}
-                </TextContent>
-                <View
-                  style={[
-                    styles.label,
-                    {backgroundColor: convertHexToRGBA(category.color, 0.2)},
-                  ]}>
-                  <TextContent
-                    style={[styles.labelText, {color: category.color}]}>
-                    {getRepeatText(habit)}
+          return (
+            <View
+              style={[
+                styles.item,
+                {backgroundColor: theme.colors.surface[100]},
+              ]}
+              key={key}>
+              <View style={[styles.itemTop]}>
+                <View style={styles.habitNameContainer}>
+                  <TextContent style={[styles.habitName]}>
+                    {habit.habitName}
                   </TextContent>
+                  <View
+                    style={[
+                      styles.label,
+                      {backgroundColor: convertHexToRGBA(category.color, 0.2)},
+                    ]}>
+                    <TextContent
+                      style={[styles.labelText, {color: category.color}]}>
+                      {getRepeatText(habit)}
+                    </TextContent>
+                  </View>
+                </View>
+
+                <View style={[styles.icon, {backgroundColor: category.color}]}>
+                  <MaterialCommunityIcons
+                    name={category.icon}
+                    size={22}
+                    color={'#fff'}
+                  />
                 </View>
               </View>
-
-              <View style={[styles.icon, {backgroundColor: category.color}]}>
-                <MaterialCommunityIcons
-                  name={category.icon}
-                  size={22}
-                  color={'#fff'}
-                />
-              </View>
+              <Days habit={habit} updateProgress={updateProgress} />
+              <BottomMenu habit={habit} category={category} />
             </View>
-            <Days habit={habit} />
-            <BottomMenu habit={habit} category={category} />
-          </View>
-        );
-      })}
-    </View>
+          );
+        })}
+      </View>
+      <UpdateUi />
+    </>
   );
 };
 
@@ -159,9 +167,10 @@ const BottomMenu = ({habit, category}: IBottomMenuProps) => {
 
 interface IDaysProps {
   habit: THabit;
+  updateProgress: (habit: THabit, date: moment.Moment) => void;
 }
 
-const Days = ({habit}: IDaysProps) => {
+const Days = ({habit, updateProgress}: IDaysProps) => {
   const {theme} = useTheme();
 
   const [days] = useState<Moment[]>(() => {
@@ -182,6 +191,7 @@ const Days = ({habit}: IDaysProps) => {
 
         return (
           <Pressable
+            onPress={() => updateProgress(habit, day)}
             key={index}
             disabled={disabled}
             style={[styles.dayItem, {opacity}]}>
