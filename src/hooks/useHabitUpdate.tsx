@@ -9,13 +9,13 @@ export const useHabitUpdate = () => {
   const [activeHabit, setActiveHabit] = useState<THabit>();
   const [activeDate, setActiveDate] = useState<string>('');
 
+  const historyModel = getHistoryModel();
+
   const updateProgressInDb = (
     habit: THabit,
     date: string,
     progress?: number | string,
   ) => {
-    const historyModel = getHistoryModel();
-
     let record =
       historyModel.findOne({date: date}) ||
       historyModel.insertOne({date: date, habits: []});
@@ -64,6 +64,13 @@ export const useHabitUpdate = () => {
           title="Goal"
           updateNumber={val => updateProgressInDb(activeHabit, activeDate, val)}
           updateVisibility={visibility => setOpenModal(visibility)}
+          defaultValue={
+            historyModel
+              .findOne({date: activeDate})
+              ?.habits.find(record => record.habitId === activeHabit.id)
+              ?.progress as number
+          }
+          targetValue={activeHabit.habitConfig?.goalNumber}
         />
       );
 

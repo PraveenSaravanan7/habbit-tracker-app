@@ -11,6 +11,7 @@ interface INumberInputModalProps {
   updateNumber: (val: number) => void;
   title: string;
   defaultValue?: number;
+  targetValue?: number;
 }
 
 export const NumberInputModal = ({
@@ -19,6 +20,7 @@ export const NumberInputModal = ({
   updateVisibility,
   title,
   defaultValue = 0,
+  targetValue,
 }: INumberInputModalProps) => {
   const {theme} = useTheme();
 
@@ -77,6 +79,12 @@ export const NumberInputModal = ({
               <MaterialCommunityIcons name="plus" color="#fff" size={22} />
             </Pressable>
           </View>
+          {targetValue !== undefined && (
+            <TextContent
+              style={[styles.targetInput, {color: theme.colors.disabledText}]}>
+              Progress: {value}/{targetValue}
+            </TextContent>
+          )}
         </View>
         <View style={[styles.actionsContainer, {borderTopColor: borderColor}]}>
           <Pressable
@@ -102,6 +110,9 @@ export const NumberInputModal = ({
 };
 
 const styles = StyleSheet.create({
+  targetInput: {
+    fontSize: 12,
+  },
   incButtonText: {
     fontSize: 22,
   },
