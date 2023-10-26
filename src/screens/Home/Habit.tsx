@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
   REPEAT_TYPE,
@@ -173,23 +173,32 @@ const Days = ({habit}: IDaysProps) => {
 
     return list;
   });
+
   return (
     <View style={[styles.daysContainer]}>
-      {days.map(day => (
-        <View style={[styles.dayItem]}>
-          <TextContent
-            style={[styles.dayText, {color: theme.colors.disabledText}]}>
-            {day.format('ddd')}
-          </TextContent>
-          <View
-            style={[
-              styles.dateContainer,
-              {backgroundColor: theme.colors.surface[200]},
-            ]}>
-            <TextContent>{day.date()}</TextContent>
-          </View>
-        </View>
-      ))}
+      {days.map((day, index) => {
+        const disabled = day.isBefore(moment(habit.startDate, 'DD/MM/YYYY'));
+        const opacity = disabled ? 0.4 : 1;
+
+        return (
+          <Pressable
+            key={index}
+            disabled={disabled}
+            style={[styles.dayItem, {opacity}]}>
+            <TextContent
+              style={[styles.dayText, {color: theme.colors.disabledText}]}>
+              {day.format('ddd')}
+            </TextContent>
+            <View
+              style={[
+                styles.dateContainer,
+                {backgroundColor: theme.colors.surface[200]},
+              ]}>
+              <TextContent>{day.date()}</TextContent>
+            </View>
+          </Pressable>
+        );
+      })}
     </View>
   );
 };
@@ -218,7 +227,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 36,
     height: 36,
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },

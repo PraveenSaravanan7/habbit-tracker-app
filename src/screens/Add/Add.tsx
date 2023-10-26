@@ -63,7 +63,7 @@ export const Add = () => {
     days: undefined,
   });
   const [startDate, setStartDate] = useState(
-    moment().format('DD/MM/YY').toString(),
+    moment().format('DD/MM/YYYY').toString(),
   );
   const [endDate, setEndDate] = useState('');
   const [priority, setPriority] = useState(1);
@@ -153,7 +153,7 @@ export const Add = () => {
         break;
 
       case SCREENS.SELECT_START_DATE:
-        setStartDate(moment().format('DD/MM/YY').toString());
+        setStartDate(moment().format('DD/MM/YYYY').toString());
         setEndDate('');
         setPriority(1);
         setActiveScreen(SCREENS.SELECT_REPEAT_CONFIG);

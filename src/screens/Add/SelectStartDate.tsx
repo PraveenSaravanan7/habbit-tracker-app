@@ -27,7 +27,7 @@ export const SelectStartDate = ({
   updateStartDate,
 }: ISelectStartDateProps) => {
   const {theme} = useTheme();
-  const dateFormat = 'DD/MM/YY';
+  const dateFormat = 'DD/MM/YYYY';
 
   const buttonBackground = theme.colors.surface[200];
   const iconColor = theme.colors.primary[100];
