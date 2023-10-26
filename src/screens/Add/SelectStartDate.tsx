@@ -5,7 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import moment from 'moment';
-import {CalendarModal} from '../Home/CalendarModal';
+import {CalendarModal} from '../components/CalendarModal';
 import {Modal} from '../../components/Modal';
 import {TextInput} from '../../components/TextInput';
 

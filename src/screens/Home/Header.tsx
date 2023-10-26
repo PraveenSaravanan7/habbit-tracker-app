@@ -6,7 +6,7 @@ import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import {MAIN_TABS} from './types';
 import moment, {Moment} from 'moment';
-import {CalendarModal} from './CalendarModal';
+import {CalendarModal} from '../components/CalendarModal';
 
 interface IHeaderProps {
   activeTab: MAIN_TABS;
