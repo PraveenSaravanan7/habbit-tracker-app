@@ -4,7 +4,7 @@ import getCategoryModel, {ICategory} from '../../database/models/category';
 import {TextContent} from '../../components/TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../../ThemeProvider';
-import {AddCategoryModal} from './AddCategoryModal';
+import {AddCategoryModal} from '../components/AddCategoryModal';
 
 export const Category = () => {
   const {theme} = useTheme();
