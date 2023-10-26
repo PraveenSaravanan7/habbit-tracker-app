@@ -23,6 +23,7 @@ interface ITextInputProps {
   labelBackgroundColor?: string;
   keyboardType?: KeyboardTypeOptions;
   flex?: number;
+  maxLength?: number;
 }
 
 export const TextInput = ({
@@ -38,6 +39,7 @@ export const TextInput = ({
   labelBackgroundColor,
   keyboardType,
   flex,
+  maxLength,
 }: ITextInputProps) => {
   const {theme} = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -117,6 +119,7 @@ export const TextInput = ({
           />
         )} */}
           <RnTextInput
+            maxLength={maxLength}
             cursorColor={theme.colors.primary[100]}
             style={styles.input}
             placeholder={placeholder}

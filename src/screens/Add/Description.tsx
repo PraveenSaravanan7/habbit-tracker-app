@@ -318,8 +318,9 @@ const TimerOptions = ({
             if (Number.isInteger(+hours))
               updateGoalTime(`${hours.padStart(2, '0')}:${minutes}:${seconds}`);
           }}
-          value={hours}
+          value={hours === '0' ? '' : (+hours).toString()}
           keyboardType="number-pad"
+          maxLength={3}
         />
         <TextInput
           flex={2}
@@ -328,8 +329,9 @@ const TimerOptions = ({
             if (Number.isInteger(+minutes))
               updateGoalTime(`${hours}:${minutes.padStart(2, '0')}:${seconds}`);
           }}
-          value={minutes}
+          value={minutes === '0' ? '' : (+minutes).toString()}
           keyboardType="number-pad"
+          maxLength={2}
         />
         <TextInput
           flex={2}
@@ -338,8 +340,9 @@ const TimerOptions = ({
             if (Number.isInteger(+seconds))
               updateGoalTime(`${hours}:${minutes}:${seconds.padStart(2, '0')}`);
           }}
-          value={seconds}
+          value={seconds === '0' ? '' : (+seconds).toString()}
           keyboardType="number-pad"
+          maxLength={2}
         />
         <View style={styles.unitText}>
           <TextContent>a day.</TextContent>
@@ -378,8 +381,9 @@ const NumericOptions = ({
         flex={1}
         label="Goal"
         onChangeText={number => updateGoal(+number)}
-        value={goal?.toString()}
+        value={goal ? goal?.toString() : ''}
         keyboardType="number-pad"
+        maxLength={3}
       />
     </View>
     <View style={[styles.items]}>
