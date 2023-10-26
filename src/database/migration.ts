@@ -17,19 +17,21 @@ const migration = () => {
 const initHabits = () => {
   if (database.getCollection(COLLECTION.HABITS)) return;
 
-  database.addCollection(COLLECTION.HABITS);
+  database.addCollection(COLLECTION.HABITS, {indices: ['id']});
 };
 
 const initHistory = () => {
   if (database.getCollection(COLLECTION.HISTORY)) return;
 
-  database.addCollection(COLLECTION.HISTORY);
+  database.addCollection(COLLECTION.HISTORY, {indices: ['date']});
 };
 
 const initCategories = () => {
   if (database.getCollection(COLLECTION.CATEGORIES)) return;
 
-  const collection = database.addCollection(COLLECTION.CATEGORIES);
+  const collection = database.addCollection(COLLECTION.CATEGORIES, {
+    indices: ['id'],
+  });
 
   const categories: ICategory[] = [
     {

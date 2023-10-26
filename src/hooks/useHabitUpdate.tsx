@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {HABIT_TYPES, THabit} from '../database/models/habit';
+import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
@@ -37,13 +37,28 @@ export const useHabitUpdate = () => {
       habitProgress.completed = !habitProgress.completed;
 
     if (habit.habitType === HABIT_TYPES.NUMERIC) {
-      habitProgress.completed = habit.habitConfig?.goalNumber === progress;
+      if (
+        habit.habitConfig?.goalNumber &&
+        typeof habit.habitConfig?.goalNumber === 'number' &&
+        typeof progress === 'number'
+      ) {
+        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+          habitProgress.completed = habit.habitConfig?.goalNumber === progress;
+        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+          habitProgress.completed = undefined !== progress;
+        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+          habitProgress.completed = progress >= habit.habitConfig.goalNumber;
+        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+          habitProgress.completed = progress < habit.habitConfig.goalNumber;
+      }
+
       habitProgress.progress = progress;
     }
 
     historyModel.update(record);
 
-    console.log('Updating record', record, habitProgress);
+    setActiveDate('');
+    setActiveHabit(undefined);
   };
 
   const updateProgress = (habit: THabit, date: Moment) => {

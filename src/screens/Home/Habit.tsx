@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
@@ -13,6 +13,8 @@ import getCategoryModel, {ICategory} from '../../database/models/category';
 import {convertHexToRGBA} from '../../utils';
 import moment, {Moment} from 'moment';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
+import getHistoryModel, {IHistory} from '../../database/models/history';
+import {commonColors} from '../../../themes';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -20,6 +22,7 @@ export const Habit = () => {
 
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [history, setHistory] = useState<IHistory[]>([]);
 
   const {theme} = useTheme();
   const {UpdateUi, updateProgress} = useHabitUpdate();
@@ -40,6 +43,15 @@ export const Habit = () => {
       return repeatConfig.days.join(', ');
   };
 
+  const days = useMemo(() => {
+    const list: Moment[] = [];
+    let i = -7;
+
+    while (i++) list.push(moment().add(i, 'days'));
+
+    return list;
+  }, []);
+
   useEffect(() => {
     const updateHabit = () => {
       console.log('updateHabit');
@@ -58,6 +70,15 @@ export const Habit = () => {
 
     console.log('--- called');
   }, [categoryModel, habitModel]);
+
+  useEffect(() => {
+    setHistory(() =>
+      getHistoryModel().find({
+        date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -99,7 +120,12 @@ export const Habit = () => {
                   />
                 </View>
               </View>
-              <Days habit={habit} updateProgress={updateProgress} />
+              <Days
+                habit={habit}
+                updateProgress={updateProgress}
+                days={days}
+                history={history}
+              />
               <BottomMenu habit={habit} category={category} />
             </View>
           );
@@ -115,7 +141,7 @@ interface IBottomMenuProps {
   category: ICategory;
 }
 
-const BottomMenu = ({habit, category}: IBottomMenuProps) => {
+const BottomMenu = ({category}: IBottomMenuProps) => {
   const {theme} = useTheme();
 
   return (
@@ -168,26 +194,32 @@ const BottomMenu = ({habit, category}: IBottomMenuProps) => {
 interface IDaysProps {
   habit: THabit;
   updateProgress: (habit: THabit, date: moment.Moment) => void;
+  days: Moment[];
+  history: IHistory[];
 }
 
-const Days = ({habit, updateProgress}: IDaysProps) => {
+const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
   const {theme} = useTheme();
-
-  const [days] = useState<Moment[]>(() => {
-    const list: Moment[] = [];
-
-    let i = -7;
-
-    while (i++) list.push(moment().add(i, 'days'));
-
-    return list;
-  });
 
   return (
     <View style={[styles.daysContainer]}>
       {days.map((day, index) => {
-        const disabled = day.isBefore(moment(habit.startDate, 'DD/MM/YYYY'));
+        const startDate = moment(habit.startDate, 'DD/MM/YYYY');
+        const disabled = day.isBefore(startDate);
         const opacity = disabled ? 0.4 : 1;
+        const borderWidth = disabled ? 0 : 2;
+
+        const progress = history
+          .find(h => h.date === day.format('DD/MM/YYYY'))
+          ?.habits.find(h => h.habitId === habit.id);
+
+        const color = progress
+          ? progress.completed
+            ? commonColors.green
+            : commonColors.red
+          : day.isBefore(moment().startOf('day'))
+          ? commonColors.orange
+          : theme.colors.disabledText;
 
         return (
           <Pressable
@@ -202,7 +234,11 @@ const Days = ({habit, updateProgress}: IDaysProps) => {
             <View
               style={[
                 styles.dateContainer,
-                {backgroundColor: theme.colors.surface[200]},
+                {
+                  backgroundColor: theme.colors.surface[200],
+                  borderWidth,
+                  borderColor: color,
+                },
               ]}>
               <TextContent>{day.date()}</TextContent>
             </View>

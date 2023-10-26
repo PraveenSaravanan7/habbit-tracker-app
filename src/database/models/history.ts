@@ -1,7 +1,7 @@
 import COLLECTION from '../collections';
 import database from '../database';
 
-interface IHistory {
+export interface IHistory {
   date: string;
   habits: {
     habitId: string;
