@@ -9,7 +9,7 @@ import {commonColors} from '../../../themes';
 import {v4 as uuid} from 'uuid';
 import {TextInput} from '../../components/TextInput';
 
-interface IAddCategoryModal {
+interface IAddCategoryModalProps {
   isOpen: boolean;
   updateVisibility: (visibility: boolean) => void;
   upsertCategory: (category: ICategory) => void;
@@ -23,7 +23,7 @@ export const AddCategoryModal = ({
   upsertCategory,
   deleteCategory,
   categoryToUpdate,
-}: IAddCategoryModal) => {
+}: IAddCategoryModalProps) => {
   const {theme} = useTheme();
 
   const [category, setCategory] = useState<ICategory>(

@@ -2,13 +2,12 @@ import React, {useState} from 'react';
 import {HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
-import {View} from 'react-native';
-import {Modal} from '../components/Modal';
-import {TextContent} from '../components/TextContent';
+import {NumberInputModal} from '../screens/components/NumberInputModal';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
   const [activeHabit, setActiveHabit] = useState<THabit>();
+  const [activeDate, setActiveDate] = useState<string>('');
 
   const updateProgressInDb = (
     habit: THabit,
@@ -49,29 +48,26 @@ export const useHabitUpdate = () => {
 
   const updateProgress = (habit: THabit, date: Moment) => {
     setActiveHabit(habit);
+    setActiveDate(date.format('DD/MM/YYYY'));
 
     if (habit.habitType === HABIT_TYPES.YES_OR_NO)
       updateProgressInDb(habit, date.format('DD/MM/YYYY'));
 
-    if (habit.habitType === HABIT_TYPES.NUMERIC) {
-      setOpenModal(true);
-    }
+    if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
   };
 
-  const NumericUpdate = () => (
-    <View>
-      <TextContent>Numeric update</TextContent>
-    </View>
-  );
-
   const UpdateUi = () => {
-    return (
-      <Modal isVisible={openModal} updateVisibility={v => setOpenModal(v)}>
-        <>
-          {activeHabit?.habitType === HABIT_TYPES.NUMERIC && <NumericUpdate />}
-        </>
-      </Modal>
-    );
+    if (activeHabit?.habitType === HABIT_TYPES.NUMERIC)
+      return (
+        <NumberInputModal
+          isOpen={openModal}
+          title="Goal"
+          updateNumber={val => updateProgressInDb(activeHabit, activeDate, val)}
+          updateVisibility={visibility => setOpenModal(visibility)}
+        />
+      );
+
+    return null;
   };
 
   return {updateProgress, UpdateUi};
