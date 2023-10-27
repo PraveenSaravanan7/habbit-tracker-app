@@ -3,6 +3,7 @@ import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
+import {CheckListModal} from '../screens/components/CheckListModal';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -11,81 +12,105 @@ export const useHabitUpdate = () => {
 
   const historyModel = getHistoryModel();
 
-  const updateProgressInDb = (
-    habit: THabit,
-    date: string,
-    progress?: number | string,
-  ) => {
+  const getHistoryRecord = () => {
     let record =
-      historyModel.findOne({date: date}) ||
-      historyModel.insertOne({date: date, habits: []});
+      historyModel.findOne({date: activeDate}) ||
+      historyModel.insertOne({date: activeDate, habits: []});
 
-    if (!record) return;
+    if (!activeHabit || !record) return;
 
-    let habitProgress = record.habits.find(h => h.habitId === habit.id);
+    let habitProgress = record.habits.find(h => h.habitId === activeHabit.id);
 
     if (!habitProgress) {
       habitProgress = {
-        habitId: habit.id,
+        habitId: activeHabit.id,
         completed: false,
       };
 
       record.habits.push(habitProgress);
     }
 
-    if (habit.habitType === HABIT_TYPES.YES_OR_NO)
+    return record;
+  };
+
+  const updateProgressInDb = (progress?: number | string | number[]) => {
+    const record = getHistoryRecord();
+    const habitProgress = record?.habits.find(
+      h => h.habitId === activeHabit?.id,
+    ); // TODO: Maybe use it from getHistoryRecord
+
+    if (!activeHabit || !record || !habitProgress) return;
+
+    const {habitConfig, habitType} = activeHabit;
+
+    if (habitType === HABIT_TYPES.YES_OR_NO)
       habitProgress.completed = !habitProgress.completed;
 
-    if (habit.habitType === HABIT_TYPES.NUMERIC) {
+    if (habitType === HABIT_TYPES.CHECKLIST && typeof progress === 'object')
+      habitProgress.completed =
+        progress.length === habitConfig?.checkList.length;
+
+    if (habitType === HABIT_TYPES.NUMERIC) {
       if (
-        habit.habitConfig?.goalNumber &&
-        typeof habit.habitConfig?.goalNumber === 'number' &&
+        habitConfig?.goalNumber &&
+        typeof habitConfig?.goalNumber === 'number' &&
         typeof progress === 'number'
       ) {
-        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
-          habitProgress.completed = habit.habitConfig?.goalNumber === progress;
-        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
-          habitProgress.completed = undefined !== progress;
-        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
-          habitProgress.completed = progress >= habit.habitConfig.goalNumber;
-        if (habit.habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
-          habitProgress.completed = progress < habit.habitConfig.goalNumber;
-      }
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+          habitProgress.completed = habitConfig?.goalNumber === progress;
 
-      habitProgress.progress = progress;
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+          habitProgress.completed = undefined !== progress;
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+          habitProgress.completed = progress >= habitConfig.goalNumber;
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+          habitProgress.completed = progress < habitConfig.goalNumber;
+      }
     }
 
-    historyModel.update(record);
+    habitProgress.progress = progress;
 
-    setActiveDate('');
-    setActiveHabit(undefined);
+    historyModel.update(record);
   };
 
   const updateProgress = (habit: THabit, date: Moment) => {
     setActiveHabit(habit);
     setActiveDate(date.format('DD/MM/YYYY'));
 
-    if (habit.habitType === HABIT_TYPES.YES_OR_NO)
-      updateProgressInDb(habit, date.format('DD/MM/YYYY'));
+    if (habit.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
 
     if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
+
+    if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
   };
 
   const UpdateUi = () => {
+    const progress = historyModel
+      .findOne({date: activeDate})
+      ?.habits.find(record => record.habitId === activeHabit?.id)?.progress;
+
     if (activeHabit?.habitType === HABIT_TYPES.NUMERIC)
       return (
         <NumberInputModal
           isOpen={openModal}
           title="Goal"
-          updateNumber={val => updateProgressInDb(activeHabit, activeDate, val)}
+          updateNumber={val => updateProgressInDb(val)}
           updateVisibility={visibility => setOpenModal(visibility)}
-          defaultValue={
-            historyModel
-              .findOne({date: activeDate})
-              ?.habits.find(record => record.habitId === activeHabit.id)
-              ?.progress as number
-          }
+          defaultValue={progress as number}
           targetValue={activeHabit.habitConfig?.goalNumber}
+        />
+      );
+
+    if (activeHabit?.habitType === HABIT_TYPES.CHECKLIST)
+      return (
+        <CheckListModal
+          isOpen={openModal}
+          updateVisibility={visibility => setOpenModal(visibility)}
+          defaultChecked={progress as number[]}
+          updateChecked={progress => updateProgressInDb(progress)}
+          list={activeHabit.habitConfig?.checkList || []}
         />
       );
 

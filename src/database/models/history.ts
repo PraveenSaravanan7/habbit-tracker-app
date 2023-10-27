@@ -5,7 +5,7 @@ export interface IHistory {
   date: string;
   habits: {
     habitId: string;
-    progress?: number | string;
+    progress?: number | string | number[];
     completed: boolean;
   }[];
 }

@@ -58,7 +58,8 @@ export const NumberInputModal = ({
               onPress={() => setValue(prev => prev - 1)}
               style={[
                 styles.incButton,
-                {borderRightWidth: 1, borderColor: theme.colors.surface[300]},
+                styles.incButtonLeft,
+                {borderColor: theme.colors.surface[300]},
               ]}>
               <MaterialCommunityIcons name="minus" color="#fff" size={22} />
             </Pressable>
@@ -74,7 +75,8 @@ export const NumberInputModal = ({
               onPress={() => setValue(prev => prev + 1)}
               style={[
                 styles.incButton,
-                {borderLeftWidth: 1, borderColor: theme.colors.surface[300]},
+                styles.incButtonRight,
+                {borderColor: theme.colors.surface[300]},
               ]}>
               <MaterialCommunityIcons name="plus" color="#fff" size={22} />
             </Pressable>
@@ -126,6 +128,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '20%',
   },
+  incButtonLeft: {borderRightWidth: 1},
+  incButtonRight: {borderLeftWidth: 1},
   inputWrapper: {
     borderWidth: 1,
     borderRadius: 8,

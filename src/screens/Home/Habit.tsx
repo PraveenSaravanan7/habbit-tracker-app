@@ -67,11 +67,6 @@ export const Habit = () => {
   useEffect(() => {
     setHabits(habitModel.find().sort((a, b) => b.priority - a.priority));
     setCategories(categoryModel.find());
-
-    console.log('--- called');
-  }, [categoryModel, habitModel]);
-
-  useEffect(() => {
     setHistory(() =>
       getHistoryModel().find({
         date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
@@ -95,31 +90,11 @@ export const Habit = () => {
                 {backgroundColor: theme.colors.surface[100]},
               ]}
               key={key}>
-              <View style={[styles.itemTop]}>
-                <View style={styles.habitNameContainer}>
-                  <TextContent style={[styles.habitName]}>
-                    {habit.habitName}
-                  </TextContent>
-                  <View
-                    style={[
-                      styles.label,
-                      {backgroundColor: convertHexToRGBA(category.color, 0.2)},
-                    ]}>
-                    <TextContent
-                      style={[styles.labelText, {color: category.color}]}>
-                      {getRepeatText(habit)}
-                    </TextContent>
-                  </View>
-                </View>
-
-                <View style={[styles.icon, {backgroundColor: category.color}]}>
-                  <MaterialCommunityIcons
-                    name={category.icon}
-                    size={22}
-                    color={'#fff'}
-                  />
-                </View>
-              </View>
+              <Title
+                habit={habit}
+                category={category}
+                repeatInfo={getRepeatText(habit) || ''}
+              />
               <Days
                 habit={habit}
                 updateProgress={updateProgress}
@@ -135,6 +110,33 @@ export const Habit = () => {
     </>
   );
 };
+
+interface ITitleProps {
+  habit: THabit;
+  category: ICategory;
+  repeatInfo: string;
+}
+
+const Title = ({habit, category, repeatInfo}: ITitleProps) => (
+  <View style={[styles.itemTop]}>
+    <View style={styles.habitNameContainer}>
+      <TextContent style={[styles.habitName]}>{habit.habitName}</TextContent>
+      <View
+        style={[
+          styles.label,
+          {backgroundColor: convertHexToRGBA(category.color, 0.2)},
+        ]}>
+        <TextContent style={[styles.labelText, {color: category.color}]}>
+          {repeatInfo}
+        </TextContent>
+      </View>
+    </View>
+
+    <View style={[styles.icon, {backgroundColor: category.color}]}>
+      <MaterialCommunityIcons name={category.icon} size={22} color={'#fff'} />
+    </View>
+  </View>
+);
 
 interface IBottomMenuProps {
   habit: THabit;
