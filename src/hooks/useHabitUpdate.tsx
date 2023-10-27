@@ -4,6 +4,7 @@ import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
+import {TimeInputModal} from '../screens/components/TimeInputModal';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -70,6 +71,35 @@ export const useHabitUpdate = () => {
       }
     }
 
+    if (habitType === HABIT_TYPES.TIMER) {
+      if (
+        habitConfig?.duration &&
+        typeof habitConfig?.duration === 'string' &&
+        typeof progress === 'string'
+      ) {
+        const getSeconds = (time: string) => {
+          const [hours, minutes, seconds] = time.split(':');
+
+          return +hours * 60 * 60 + +minutes * 60 + +seconds;
+        };
+
+        const progressNumber = getSeconds(progress);
+        const targetNumber = getSeconds(habitConfig.duration);
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+          habitProgress.completed = progressNumber === targetNumber;
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+          habitProgress.completed = progressNumber !== 0;
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+          habitProgress.completed = progressNumber >= targetNumber;
+
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+          habitProgress.completed = progressNumber < targetNumber;
+      }
+    }
+
     habitProgress.progress = progress;
 
     historyModel.update(record);
@@ -84,6 +114,8 @@ export const useHabitUpdate = () => {
     if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
 
     if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
+
+    if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
   };
 
   const UpdateUi = () => {
@@ -111,6 +143,18 @@ export const useHabitUpdate = () => {
           defaultChecked={progress as number[]}
           updateChecked={progress => updateProgressInDb(progress)}
           list={activeHabit.habitConfig?.checkList || []}
+        />
+      );
+
+    if (activeHabit?.habitType === HABIT_TYPES.TIMER)
+      return (
+        <TimeInputModal
+          isOpen={openModal}
+          title="Goal"
+          updateTime={val => updateProgressInDb(val)}
+          updateVisibility={visibility => setOpenModal(visibility)}
+          defaultValue={progress as string}
+          targetValue={activeHabit.habitConfig?.duration}
         />
       );
 
