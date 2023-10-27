@@ -3,7 +3,6 @@ import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {useTheme} from '../../../ThemeProvider';
 import {Modal} from '../../components/Modal';
 import {TextContent} from '../../components/TextContent';
-import {Radio} from '../../components/Radio';
 import {Checkbox} from '../../components/Checkbox';
 
 interface ICheckListModalProps {
