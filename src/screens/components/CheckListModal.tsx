@@ -4,6 +4,7 @@ import {useTheme} from '../../../ThemeProvider';
 import {Modal} from '../../components/Modal';
 import {TextContent} from '../../components/TextContent';
 import {Radio} from '../../components/Radio';
+import {Checkbox} from '../../components/Checkbox';
 
 interface ICheckListModalProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ export const CheckListModal = ({
                   <TextContent style={styles.itemText}>{item}</TextContent>
                 </View>
                 <View>
-                  <Radio selected={checked.includes(index)} />
+                  <Checkbox selected={checked.includes(index)} />
                 </View>
               </Pressable>
             ))}
