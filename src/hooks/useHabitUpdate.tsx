@@ -51,53 +51,51 @@ export const useHabitUpdate = () => {
       habitProgress.completed =
         progress.length === habitConfig?.checkList.length;
 
-    if (habitType === HABIT_TYPES.NUMERIC) {
-      if (
-        habitConfig?.goalNumber &&
-        typeof habitConfig?.goalNumber === 'number' &&
-        typeof progress === 'number'
-      ) {
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
-          habitProgress.completed = habitConfig?.goalNumber === progress;
+    if (
+      habitType === HABIT_TYPES.NUMERIC &&
+      habitConfig?.goalNumber &&
+      typeof habitConfig?.goalNumber === 'number' &&
+      typeof progress === 'number'
+    ) {
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+        habitProgress.completed = habitConfig?.goalNumber === progress;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
-          habitProgress.completed = undefined !== progress;
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+        habitProgress.completed = undefined !== progress;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
-          habitProgress.completed = progress >= habitConfig.goalNumber;
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+        habitProgress.completed = progress >= habitConfig.goalNumber;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
-          habitProgress.completed = progress < habitConfig.goalNumber;
-      }
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+        habitProgress.completed = progress < habitConfig.goalNumber;
     }
 
-    if (habitType === HABIT_TYPES.TIMER) {
-      if (
-        habitConfig?.duration &&
-        typeof habitConfig?.duration === 'string' &&
-        typeof progress === 'string'
-      ) {
-        const getSeconds = (time: string) => {
-          const [hours, minutes, seconds] = time.split(':');
+    if (
+      habitType === HABIT_TYPES.TIMER &&
+      habitConfig?.duration &&
+      typeof habitConfig?.duration === 'string' &&
+      typeof progress === 'string'
+    ) {
+      const getSeconds = (time: string) => {
+        const [hours, minutes, seconds] = time.split(':');
 
-          return +hours * 60 * 60 + +minutes * 60 + +seconds;
-        };
+        return +hours * 60 * 60 + +minutes * 60 + +seconds;
+      };
 
-        const progressNumber = getSeconds(progress);
-        const targetNumber = getSeconds(habitConfig.duration);
+      const progressNumber = getSeconds(progress);
+      const targetNumber = getSeconds(habitConfig.duration);
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
-          habitProgress.completed = progressNumber === targetNumber;
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+        habitProgress.completed = progressNumber === targetNumber;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
-          habitProgress.completed = progressNumber !== 0;
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+        habitProgress.completed = progressNumber !== 0;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
-          habitProgress.completed = progressNumber >= targetNumber;
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+        habitProgress.completed = progressNumber >= targetNumber;
 
-        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
-          habitProgress.completed = progressNumber < targetNumber;
-      }
+      if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+        habitProgress.completed = progressNumber < targetNumber;
     }
 
     habitProgress.progress = progress;
