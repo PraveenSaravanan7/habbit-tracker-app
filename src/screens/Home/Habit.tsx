@@ -68,9 +68,13 @@ export const Habit = () => {
     setHabits(habitModel.find().sort((a, b) => b.priority - a.priority));
     setCategories(categoryModel.find());
     setHistory(() =>
-      getHistoryModel().find({
-        date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
-      }),
+      JSON.parse(
+        JSON.stringify(
+          getHistoryModel().find({
+            date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
+          }),
+        ),
+      ),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -209,13 +213,14 @@ const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
         const startDate = moment(habit.startDate, 'DD/MM/YYYY');
         const disabled = day.isBefore(startDate);
         const opacity = disabled ? 0.4 : 1;
-        const borderWidth = disabled ? 0 : 2;
 
         const progress = history
           .find(h => h.date === day.format('DD/MM/YYYY'))
           ?.habits.find(h => h.habitId === habit.id);
 
-        const color = progress
+        const color = disabled
+          ? theme.colors.surface[200]
+          : progress
           ? progress.completed
             ? commonColors.green
             : commonColors.red
@@ -238,7 +243,6 @@ const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
                 styles.dateContainer,
                 {
                   backgroundColor: theme.colors.surface[200],
-                  borderWidth,
                   borderColor: color,
                 },
               ]}>
@@ -316,8 +320,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     aspectRatio: 1,
-    padding: 6,
+    padding: 4,
     borderRadius: 12,
+    borderWidth: 2,
   },
   itemBottom: {
     padding: 8,

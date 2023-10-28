@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
@@ -11,9 +11,9 @@ export const useHabitUpdate = () => {
   const [activeHabit, setActiveHabit] = useState<THabit>();
   const [activeDate, setActiveDate] = useState<string>('');
 
-  const historyModel = getHistoryModel();
+  const getHistoryRecord = useCallback(() => {
+    const historyModel = getHistoryModel();
 
-  const getHistoryRecord = () => {
     let record =
       historyModel.findOne({date: activeDate}) ||
       historyModel.insertOne({date: activeDate, habits: []});
@@ -32,91 +32,101 @@ export const useHabitUpdate = () => {
     }
 
     return record;
-  };
+  }, [activeDate, activeHabit]);
 
-  const updateProgressInDb = (progress?: number | string | number[]) => {
-    const record = getHistoryRecord();
-    const habitProgress = record?.habits.find(
-      h => h.habitId === activeHabit?.id,
-    ); // TODO: Maybe use it from getHistoryRecord
+  const updateProgressInDb = useCallback(
+    (progress?: number | string | number[]) => {
+      const historyModel = getHistoryModel();
 
-    if (!activeHabit || !record || !habitProgress) return;
+      const record = getHistoryRecord();
+      const habitProgress = record?.habits.find(
+        h => h.habitId === activeHabit?.id,
+      ); // TODO: Maybe use it from getHistoryRecord
 
-    const {habitConfig, habitType} = activeHabit;
+      if (!activeHabit || !record || !habitProgress) return;
 
-    if (habitType === HABIT_TYPES.YES_OR_NO)
-      habitProgress.completed = !habitProgress.completed;
+      const {habitConfig, habitType} = activeHabit;
 
-    if (habitType === HABIT_TYPES.CHECKLIST && typeof progress === 'object')
-      habitProgress.completed =
-        progress.length === habitConfig?.checkList.length;
+      if (habitType === HABIT_TYPES.YES_OR_NO)
+        habitProgress.completed = !habitProgress.completed;
 
-    if (
-      habitType === HABIT_TYPES.NUMERIC &&
-      habitConfig?.goalNumber &&
-      typeof habitConfig?.goalNumber === 'number' &&
-      typeof progress === 'number'
-    ) {
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
-        habitProgress.completed = habitConfig?.goalNumber === progress;
+      if (habitType === HABIT_TYPES.CHECKLIST && typeof progress === 'object')
+        habitProgress.completed =
+          progress.length === habitConfig?.checkList.length;
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
-        habitProgress.completed = undefined !== progress;
+      if (
+        habitType === HABIT_TYPES.NUMERIC &&
+        habitConfig?.goalNumber &&
+        typeof habitConfig?.goalNumber === 'number' &&
+        typeof progress === 'number'
+      ) {
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+          habitProgress.completed = habitConfig?.goalNumber === progress;
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
-        habitProgress.completed = progress >= habitConfig.goalNumber;
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+          habitProgress.completed = undefined !== progress;
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
-        habitProgress.completed = progress < habitConfig.goalNumber;
-    }
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+          habitProgress.completed = progress >= habitConfig.goalNumber;
 
-    if (
-      habitType === HABIT_TYPES.TIMER &&
-      habitConfig?.duration &&
-      typeof habitConfig?.duration === 'string' &&
-      typeof progress === 'string'
-    ) {
-      const getSeconds = (time: string) => {
-        const [hours, minutes, seconds] = time.split(':');
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+          habitProgress.completed = progress < habitConfig.goalNumber;
+      }
 
-        return +hours * 60 * 60 + +minutes * 60 + +seconds;
-      };
+      if (
+        habitType === HABIT_TYPES.TIMER &&
+        habitConfig?.duration &&
+        typeof habitConfig?.duration === 'string' &&
+        typeof progress === 'string'
+      ) {
+        const getSeconds = (time: string) => {
+          const [hours, minutes, seconds] = time.split(':');
 
-      const progressNumber = getSeconds(progress);
-      const targetNumber = getSeconds(habitConfig.duration);
+          return +hours * 60 * 60 + +minutes * 60 + +seconds;
+        };
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
-        habitProgress.completed = progressNumber === targetNumber;
+        const progressNumber = getSeconds(progress);
+        const targetNumber = getSeconds(habitConfig.duration);
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
-        habitProgress.completed = progressNumber !== 0;
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.EXACTLY)
+          habitProgress.completed = progressNumber === targetNumber;
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
-        habitProgress.completed = progressNumber >= targetNumber;
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.ANY_VALUE)
+          habitProgress.completed = progressNumber !== 0;
 
-      if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
-        habitProgress.completed = progressNumber < targetNumber;
-    }
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.AT_LEAST)
+          habitProgress.completed = progressNumber >= targetNumber;
 
-    habitProgress.progress = progress;
+        if (habitConfig?.comparisonType === COMPARISON_TYPE.LESS_THAN)
+          habitProgress.completed = progressNumber < targetNumber;
+      }
 
-    historyModel.update(record);
-  };
+      habitProgress.progress = progress;
 
-  const updateProgress = (habit: THabit, date: Moment) => {
-    setActiveHabit(habit);
-    setActiveDate(date.format('DD/MM/YYYY'));
+      historyModel.update(record);
+    },
+    [activeHabit, getHistoryRecord],
+  );
 
-    if (habit.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
+  const updateProgress = useCallback(
+    (habit: THabit, date: Moment) => {
+      setActiveHabit(habit);
+      setActiveDate(date.format('DD/MM/YYYY'));
 
-    if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
+      if (habit.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
 
-    if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
+      if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
 
-    if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
-  };
+      if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
+
+      if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
+    },
+    [updateProgressInDb],
+  );
 
   const UpdateUi = () => {
+    const historyModel = getHistoryModel();
+
     const progress = historyModel
       .findOne({date: activeDate})
       ?.habits.find(record => record.habitId === activeHabit?.id)?.progress;
