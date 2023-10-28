@@ -1,10 +1,16 @@
-import React, {useCallback, useState} from 'react';
-import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  COMPARISON_TYPE,
+  HABIT_TYPES,
+  HISTORY_MODEL_EVENT,
+  THabit,
+} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
+import database from '../database/database';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -104,25 +110,30 @@ export const useHabitUpdate = () => {
       habitProgress.progress = progress;
 
       historyModel.update(record);
+
+      database.emit(HISTORY_MODEL_EVENT.UPDATE_HISTORY);
+
+      setOpenModal(false);
+      setActiveDate('');
+      setActiveHabit(undefined);
     },
     [activeHabit, getHistoryRecord],
   );
 
-  const updateProgress = useCallback(
-    (habit: THabit, date: Moment) => {
-      setActiveHabit(habit);
-      setActiveDate(date.format('DD/MM/YYYY'));
+  const updateProgress = useCallback((habit: THabit, date: Moment) => {
+    setActiveHabit(habit);
+    setActiveDate(date.format('DD/MM/YYYY'));
 
-      if (habit.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
+    if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
 
-      if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
+    if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
 
-      if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
+    if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
+  }, []);
 
-      if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
-    },
-    [updateProgressInDb],
-  );
+  useEffect(() => {
+    if (activeHabit?.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
+  }, [activeHabit, updateProgressInDb]);
 
   const UpdateUi = () => {
     const historyModel = getHistoryModel();

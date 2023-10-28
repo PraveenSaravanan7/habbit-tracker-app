@@ -137,6 +137,10 @@ export enum HABIT_MODEL_EVENT {
   ADD_HABIT = 'add_habit',
 }
 
+export enum HISTORY_MODEL_EVENT {
+  UPDATE_HISTORY = 'update_history',
+}
+
 const getHabitModel = () => database.getCollection<THabit>(COLLECTION.HABITS);
 
 export default getHabitModel;
