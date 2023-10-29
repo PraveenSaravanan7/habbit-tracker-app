@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ICategory} from '../../database/models/category';
 
@@ -8,7 +8,6 @@ interface ICategoryIconProps {
   size: number;
   borderRadius: number;
   iconSize: number;
-  onPress?: () => void;
 }
 
 export const CategoryIcon = ({
@@ -16,11 +15,9 @@ export const CategoryIcon = ({
   borderRadius,
   category,
   iconSize,
-  onPress,
 }: ICategoryIconProps) => {
   return (
-    <Pressable
-      onPress={onPress}
+    <View
       style={[
         styles.categoryIcon,
         {
@@ -34,7 +31,7 @@ export const CategoryIcon = ({
         color={'#fff'}
         size={iconSize}
       />
-    </Pressable>
+    </View>
   );
 };
 
