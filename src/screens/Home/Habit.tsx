@@ -16,6 +16,8 @@ import moment, {Moment} from 'moment';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
 import getHistoryModel, {IHistory} from '../../database/models/history';
 import {commonColors} from '../../../themes';
+import {useNavigator} from '../../../NavigationUtils';
+import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -162,8 +164,9 @@ interface IBottomMenuProps {
   category: ICategory;
 }
 
-const BottomMenu = ({category}: IBottomMenuProps) => {
+const BottomMenu = ({category, habit}: IBottomMenuProps) => {
   const {theme} = useTheme();
+  const {navigate} = useNavigator();
 
   return (
     <View style={[styles.itemBottom, {borderColor: theme.colors.surface[200]}]}>
@@ -186,13 +189,17 @@ const BottomMenu = ({category}: IBottomMenuProps) => {
         </View>
       </View>
       <View style={[styles.itemBottomPart2]}>
-        <View style={[styles.bottomMenuItem]}>
+        <Pressable
+          style={[styles.bottomMenuItem]}
+          onPress={() =>
+            navigate('HabitInfo', {habit, tab: HABIT_INFO_TAB.CALENDAR})
+          }>
           <MaterialCommunityIcons
             name="calendar"
             size={22}
             color={theme.colors.surface[600]}
           />
-        </View>
+        </Pressable>
         <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
             name="chart-bar"

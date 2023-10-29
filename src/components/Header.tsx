@@ -5,7 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useTheme} from '../../ThemeProvider';
 import {useNavigator} from '../../NavigationUtils';
 
-export const Header = ({title}: {title: string}) => {
+export const Header = ({title, icon}: {title: string; icon?: JSX.Element}) => {
   const {theme} = useTheme();
   const {goBack} = useNavigator();
 
@@ -20,14 +20,15 @@ export const Header = ({title}: {title: string}) => {
       ]}>
       <Pressable onPress={goBack}>
         <MaterialCommunityIcons
-          color={theme.colors.text}
-          name="arrow-left"
-          size={28}
+          color={theme.colors.primary[100]}
+          name="chevron-left"
+          size={24}
         />
       </Pressable>
       <TextContent style={[styles.title, {color: theme.colors.text}]}>
         {title}
       </TextContent>
+      {icon}
     </View>
   );
 };
@@ -38,14 +39,13 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
     flexDirection: 'row',
-    columnGap: 16,
+    columnGap: 8,
     position: 'absolute',
     top: 0,
     zIndex: 1,
   },
   title: {
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 16,
     fontFamily: 'Inter-SemiBold',
   },
 });
