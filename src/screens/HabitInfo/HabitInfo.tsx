@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Header} from '../../components/Header';
 import {useRouter} from '../../../NavigationUtils';
 import {CategoryIcon} from '../components/CategoryIcon';
+import {Calendar} from '../../components/Calendar';
+import {useTheme} from '../../../ThemeProvider';
 
 export enum HABIT_INFO_TAB {
   CALENDAR = 'Calendar',
@@ -36,6 +38,28 @@ export const HabitInfo = () => {
         activeTab={activeTab}
         onSelectTab={updateActiveTab}
       />
+      <View style={[styles.tabWrapper]}>
+        {activeTab === HABIT_INFO_TAB.CALENDAR && <CalendarTab />}
+      </View>
     </View>
   );
 };
+
+const CalendarTab = () => {
+  const {theme} = useTheme();
+
+  return (
+    <ScrollView>
+      <Calendar
+        updateCurrentDate={console.log}
+        backgroundColor={theme.colors.background}
+      />
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  tabWrapper: {
+    paddingTop: 130,
+  },
+});

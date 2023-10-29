@@ -1,3 +1,8 @@
+import moment, {Moment} from 'moment';
+import {REPEAT_TYPE, THabit} from './database/models/habit';
+import {ITheme, commonColors} from '../themes';
+import {IHistory} from './database/models/history';
+
 export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
   let hex = hexCode.replace('#', '');
 
@@ -12,4 +17,56 @@ export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
   if (opacity > 1 && opacity <= 100) opacity = opacity / 100;
 
   return `rgba(${r},${g},${b},${opacity})`;
+};
+
+export const isDayDisabled = (day: Moment, habit: THabit) => {
+  const startDate = moment(habit.startDate, 'DD/MM/YYYY');
+  const {repeatConfig} = habit;
+
+  if (day.isBefore(startDate)) return true;
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
+    return !repeatConfig.days.includes(day.format('ddd') as any);
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH)
+    return !repeatConfig.days.includes(day.format('D') as any);
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
+    return !repeatConfig.days.includes(day.format('MMMM D'));
+
+  return false;
+};
+
+export const getDayColor = (
+  day: Moment,
+  disabled: boolean,
+  theme: ITheme,
+  progress?: IHistory['habits'][0],
+) => {
+  return disabled
+    ? theme.colors.surface[200]
+    : progress
+    ? progress.completed
+      ? commonColors.green
+      : commonColors.red
+    : day.isBefore(moment().startOf('day'))
+    ? commonColors.orange
+    : theme.colors.disabledText;
+};
+
+export const getDayColorAndIsDisabled = (
+  day: Moment,
+  habit: THabit,
+  theme: ITheme,
+  history: IHistory[],
+) => {
+  const progress = history
+    .find(h => h.date === day.format('DD/MM/YYYY'))
+    ?.habits.find(h => h.habitId === habit.id);
+
+  const isDisabled = isDayDisabled(day, habit);
+
+  const color = getDayColor(day, isDisabled, theme, progress);
+
+  return {isDisabled, color};
 };

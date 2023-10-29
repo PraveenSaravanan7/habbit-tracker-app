@@ -11,11 +11,10 @@ import database from '../../database/database';
 import {useTheme} from '../../../ThemeProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import getCategoryModel, {ICategory} from '../../database/models/category';
-import {convertHexToRGBA} from '../../utils';
+import {convertHexToRGBA, getDayColorAndIsDisabled} from '../../utils';
 import moment, {Moment} from 'moment';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
 import getHistoryModel, {IHistory} from '../../database/models/history';
-import {commonColors} from '../../../themes';
 import {useNavigator} from '../../../NavigationUtils';
 import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
 import {CategoryIcon} from '../components/CategoryIcon';
@@ -245,43 +244,16 @@ interface IDaysProps {
 const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
   const {theme} = useTheme();
 
-  const isDisabled = (day: Moment) => {
-    const startDate = moment(habit.startDate, 'DD/MM/YYYY');
-    const {repeatConfig} = habit;
-
-    if (day.isBefore(startDate)) return true;
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
-      return !repeatConfig.days.includes(day.format('ddd') as any);
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH)
-      return !repeatConfig.days.includes(day.format('D') as any);
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
-      return !repeatConfig.days.includes(day.format('MMMM D'));
-
-    return false;
-  };
-
   return (
     <View style={[styles.daysContainer]}>
       {days.map((day, index) => {
-        const disabled = isDisabled(day);
+        const {isDisabled: disabled, color} = getDayColorAndIsDisabled(
+          day,
+          habit,
+          theme,
+          history,
+        );
         const opacity = disabled ? 0.4 : 1;
-
-        const progress = history
-          .find(h => h.date === day.format('DD/MM/YYYY'))
-          ?.habits.find(h => h.habitId === habit.id);
-
-        const color = disabled
-          ? theme.colors.surface[200]
-          : progress
-          ? progress.completed
-            ? commonColors.green
-            : commonColors.red
-          : day.isBefore(moment().startOf('day'))
-          ? commonColors.orange
-          : theme.colors.disabledText;
 
         return (
           <Pressable

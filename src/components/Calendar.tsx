@@ -10,6 +10,7 @@ export interface ICalendar {
   selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
   startDate?: Moment;
+  backgroundColor?: string;
 }
 
 const dateFormat = 'MMMM YYYY';
@@ -18,6 +19,7 @@ export const Calendar = ({
   selectedDate,
   updateCurrentDate,
   startDate,
+  backgroundColor,
 }: ICalendar) => {
   const {theme} = useTheme();
 
@@ -39,7 +41,10 @@ export const Calendar = ({
 
   return (
     <View
-      style={[styles.container, {backgroundColor: theme.colors.surface[100]}]}>
+      style={[
+        styles.container,
+        {backgroundColor: backgroundColor || theme.colors.surface[100]},
+      ]}>
       <Header month={month} moveMonth={moveMonth} moveYear={moveYear} />
       <Grid
         month={month}
