@@ -5,6 +5,7 @@ import {TextContent} from '../../components/TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../../ThemeProvider';
 import {AddCategoryModal} from '../components/AddCategoryModal';
+import {CategoryIcon} from '../components/CategoryIcon';
 
 export const Category = () => {
   const {theme} = useTheme();
@@ -67,9 +68,12 @@ export const Category = () => {
   // eslint-disable-next-line react/no-unstable-nested-components
   const Item = ({category}: {category: ICategory}) => (
     <View style={[styles.categoryContainer]}>
-      <View style={[styles.categoryIcon, {backgroundColor: category.color}]}>
-        <MaterialCommunityIcons name={category.icon} color={'#fff'} size={34} />
-      </View>
+      <CategoryIcon
+        category={category}
+        size={58}
+        borderRadius={22}
+        iconSize={32}
+      />
       <TextContent
         numberOfLines={1}
         ellipsizeMode="tail"

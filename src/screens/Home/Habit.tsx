@@ -18,6 +18,7 @@ import getHistoryModel, {IHistory} from '../../database/models/history';
 import {commonColors} from '../../../themes';
 import {useNavigator} from '../../../NavigationUtils';
 import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
+import {CategoryIcon} from '../components/CategoryIcon';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -153,9 +154,12 @@ const Title = ({habit, category, repeatInfo}: ITitleProps) => (
       </View>
     </View>
 
-    <View style={[styles.icon, {backgroundColor: category.color}]}>
-      <MaterialCommunityIcons name={category.icon} size={22} color={'#fff'} />
-    </View>
+    <CategoryIcon
+      category={category}
+      size={36}
+      borderRadius={12}
+      iconSize={22}
+    />
   </View>
 );
 

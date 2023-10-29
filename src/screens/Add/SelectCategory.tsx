@@ -3,8 +3,8 @@ import {Pressable, StyleSheet, View} from 'react-native';
 import {TextContent} from '../../components/TextContent';
 import {useTheme} from '../../../ThemeProvider';
 import getCategoryModel, {ICategory} from '../../database/models/category';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Title} from './Title';
+import {CategoryIcon} from '../components/CategoryIcon';
 
 interface ISelectCategory {
   onSelectCategory: (category: ICategory) => void;
@@ -41,14 +41,12 @@ export const SelectCategory = ({onSelectCategory}: ISelectCategory) => {
                 {category.name}
               </TextContent>
             </View>
-            <View
-              style={[styles.iconContainer, {backgroundColor: category.color}]}>
-              <MaterialCommunityIcons
-                name={category.icon}
-                color={'#fff'}
-                size={22}
-              />
-            </View>
+            <CategoryIcon
+              iconSize={22}
+              category={category}
+              size={32}
+              borderRadius={8}
+            />
           </Pressable>
         ))}
       </View>

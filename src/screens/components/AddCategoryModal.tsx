@@ -8,6 +8,7 @@ import {ICategory} from '../../database/models/category';
 import {commonColors} from '../../../themes';
 import {v4 as uuid} from 'uuid';
 import {TextInput} from '../../components/TextInput';
+import {CategoryIcon} from './CategoryIcon';
 
 interface IAddCategoryModalProps {
   isOpen: boolean;
@@ -81,17 +82,12 @@ export const AddCategoryModal = ({
               </TextContent>
             </View>
             <View>
-              <View
-                style={[
-                  styles.iconContainer,
-                  {backgroundColor: category.color},
-                ]}>
-                <MaterialCommunityIcons
-                  name={category.icon}
-                  color="#fff"
-                  size={24}
-                />
-              </View>
+              <CategoryIcon
+                category={category}
+                size={36}
+                borderRadius={12}
+                iconSize={24}
+              />
             </View>
           </View>
 
