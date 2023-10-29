@@ -62,7 +62,7 @@ export const Header = ({
           </Pressable>
           <Pressable onPress={() => updateCalendarModalVisibility(true)}>
             <MaterialCommunityIcons
-              name="calendar"
+              name="calendar-outline"
               color={theme.colors.text}
               size={28}
             />

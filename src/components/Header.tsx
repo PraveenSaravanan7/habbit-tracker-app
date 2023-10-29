@@ -5,12 +5,24 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useTheme} from '../../ThemeProvider';
 import {useNavigator} from '../../NavigationUtils';
 
-interface IHeaderProps {
+interface IHeaderBaseProps {
   title: string;
   icon?: JSX.Element;
 }
 
-export const Header = ({title, icon}: IHeaderProps) => {
+type THeaderProps = (
+  | {tabs?: never; activeTab?: never; onSelectTab?: never}
+  | {tabs: string[]; activeTab: string; onSelectTab: (tab: string) => void}
+) &
+  IHeaderBaseProps;
+
+export const Header = ({
+  title,
+  icon,
+  tabs,
+  activeTab,
+  onSelectTab,
+}: THeaderProps) => {
   const {theme} = useTheme();
   const {goBack} = useNavigator();
 
@@ -39,11 +51,59 @@ export const Header = ({title, icon}: IHeaderProps) => {
         </View>
         {icon}
       </View>
+      {tabs && (
+        <View style={styles.tabContainer}>
+          {tabs.map((tabName, index) => (
+            <Pressable
+              onPress={() => onSelectTab(tabName)}
+              style={[
+                styles.tabItem,
+                activeTab === tabName && styles.activeTab,
+                {borderBottomColor: theme.colors.primary[100]},
+              ]}
+              key={index}>
+              <TextContent
+                style={[
+                  [
+                    styles.tabName,
+                    activeTab === tabName && styles.activeTabName,
+                    {
+                      color:
+                        activeTab === tabName
+                          ? theme.colors.text
+                          : theme.colors.disabledText,
+                    },
+                  ],
+                ]}>
+                {tabName}
+              </TextContent>
+            </Pressable>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  tabName: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+  },
+  activeTabName: {fontFamily: 'Inter-Bold'},
+  activeTab: {
+    borderBottomWidth: 2,
+  },
+  tabItem: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    border: 0,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+  },
   wrapper: {
     width: '100%',
     flexDirection: 'column',

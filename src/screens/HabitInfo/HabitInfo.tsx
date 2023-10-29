@@ -1,19 +1,24 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import {Header} from '../../components/Header';
 import {useRouter} from '../../../NavigationUtils';
 import {CategoryIcon} from '../components/CategoryIcon';
 
 export enum HABIT_INFO_TAB {
-  CALENDAR,
-  STATS,
-  EDIT,
+  CALENDAR = 'Calendar',
+  STATS = 'Statistics',
+  EDIT = 'Edit',
 }
 
 export const HabitInfo = () => {
   const {
-    params: {habit, category},
+    params: {habit, category, tab},
   } = useRouter<'HabitInfo'>();
+
+  const [activeTab, setActiveTab] = useState(tab);
+
+  const updateActiveTab = (selectedTab: string) =>
+    setActiveTab(selectedTab as HABIT_INFO_TAB);
 
   return (
     <View>
@@ -27,6 +32,9 @@ export const HabitInfo = () => {
             category={category}
           />
         }
+        tabs={Object.values(HABIT_INFO_TAB)}
+        activeTab={activeTab}
+        onSelectTab={updateActiveTab}
       />
     </View>
   );

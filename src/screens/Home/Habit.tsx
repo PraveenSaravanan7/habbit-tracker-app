@@ -178,7 +178,7 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
         <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
             name="link-variant"
-            size={16}
+            size={18}
             color={category.color}
           />
           <TextContent style={styles.bottomMenuItemText}>0</TextContent>
@@ -186,7 +186,7 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
         <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
             name="check-circle-outline"
-            size={16}
+            size={18}
             color={category.color}
           />
           <TextContent style={styles.bottomMenuItemText}>10%</TextContent>
@@ -203,22 +203,30 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
             })
           }>
           <MaterialCommunityIcons
-            name="calendar"
-            size={22}
+            name="calendar-outline"
+            size={24}
+            color={theme.colors.surface[600]}
+          />
+        </Pressable>
+        <Pressable
+          onPress={() =>
+            navigate('HabitInfo', {
+              category,
+              habit,
+              tab: HABIT_INFO_TAB.STATS,
+            })
+          }
+          style={[styles.bottomMenuItem]}>
+          <MaterialCommunityIcons
+            name="chart-line"
+            size={24}
             color={theme.colors.surface[600]}
           />
         </Pressable>
         <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
-            name="chart-bar"
-            size={22}
-            color={theme.colors.surface[600]}
-          />
-        </View>
-        <View style={[styles.bottomMenuItem]}>
-          <MaterialCommunityIcons
             name="dots-vertical"
-            size={22}
+            size={24}
             color={theme.colors.surface[600]}
           />
         </View>
@@ -348,7 +356,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'center',
-    columnGap: 12,
+    columnGap: 10,
     paddingHorizontal: 16,
     paddingTop: 4,
     paddingBottom: 12,
@@ -367,7 +375,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     aspectRatio: 1,
-    padding: 4,
+    padding: 6,
     borderRadius: 12,
     borderWidth: 2,
   },
