@@ -119,6 +119,8 @@ export const Add = () => {
 
     habitModel.insertOne(habit);
 
+    console.log('-- Added habit ', habit);
+
     database.emit(HABIT_MODEL_EVENT.ADD_HABIT); // TODO: Maybe add data arg as well
 
     goBack();

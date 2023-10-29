@@ -222,11 +222,28 @@ interface IDaysProps {
 const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
   const {theme} = useTheme();
 
+  const isDisabled = (day: Moment) => {
+    const startDate = moment(habit.startDate, 'DD/MM/YYYY');
+    const {repeatConfig} = habit;
+
+    if (day.isBefore(startDate)) return true;
+
+    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
+      return !repeatConfig.days.includes(day.format('ddd') as any);
+
+    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH)
+      return !repeatConfig.days.includes(day.format('D') as any);
+
+    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
+      return !repeatConfig.days.includes(day.format('MMMM D'));
+
+    return false;
+  };
+
   return (
     <View style={[styles.daysContainer]}>
       {days.map((day, index) => {
-        const startDate = moment(habit.startDate, 'DD/MM/YYYY');
-        const disabled = day.isBefore(startDate);
+        const disabled = isDisabled(day);
         const opacity = disabled ? 0.4 : 1;
 
         const progress = history
