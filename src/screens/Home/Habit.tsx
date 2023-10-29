@@ -196,7 +196,11 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
         <Pressable
           style={[styles.bottomMenuItem]}
           onPress={() =>
-            navigate('HabitInfo', {habit, tab: HABIT_INFO_TAB.CALENDAR})
+            navigate('HabitInfo', {
+              category,
+              habit,
+              tab: HABIT_INFO_TAB.CALENDAR,
+            })
           }>
           <MaterialCommunityIcons
             name="calendar"

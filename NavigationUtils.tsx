@@ -7,12 +7,13 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {THabit} from './src/database/models/habit';
 import {HABIT_INFO_TAB} from './src/screens/HabitInfo/HabitInfo';
+import {ICategory} from './src/database/models/category';
 
 export type TStackScreens = {
   Home: undefined;
   Add: undefined;
   Search: {text: string};
-  HabitInfo: {habit: THabit; tab: HABIT_INFO_TAB};
+  HabitInfo: {habit: THabit; category: ICategory; tab: HABIT_INFO_TAB};
 };
 
 export type TStackNavigation = NavigationProp<TStackScreens>;
