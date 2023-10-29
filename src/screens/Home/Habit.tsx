@@ -247,7 +247,7 @@ const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
   return (
     <View style={[styles.daysContainer]}>
       {days.map((day, index) => {
-        const {isDisabled: disabled, color} = getDayColorAndIsDisabled(
+        const {disabled, color} = getDayColorAndIsDisabled(
           day,
           habit,
           theme,

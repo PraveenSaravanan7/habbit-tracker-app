@@ -23,7 +23,8 @@ export const isDayDisabled = (day: Moment, habit: THabit) => {
   const startDate = moment(habit.startDate, 'DD/MM/YYYY');
   const {repeatConfig} = habit;
 
-  if (day.isBefore(startDate)) return true;
+  if (day.isBefore(startDate) || day.isAfter(moment().endOf('day')))
+    return true;
 
   if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
     return !repeatConfig.days.includes(day.format('ddd') as any);
@@ -64,9 +65,9 @@ export const getDayColorAndIsDisabled = (
     .find(h => h.date === day.format('DD/MM/YYYY'))
     ?.habits.find(h => h.habitId === habit.id);
 
-  const isDisabled = isDayDisabled(day, habit);
+  const disabled = isDayDisabled(day, habit);
 
-  const color = getDayColor(day, isDisabled, theme, progress);
+  const color = getDayColor(day, disabled, theme, progress);
 
-  return {isDisabled, color};
+  return {disabled, color};
 };
