@@ -50,7 +50,7 @@ export const Habit = () => {
     const list: Moment[] = [];
     let i = -7;
 
-    while (i++) list.push(moment().add(i, 'days'));
+    while (i++) list.push(moment().add(i, 'days').startOf('day'));
 
     return list;
   }, []);

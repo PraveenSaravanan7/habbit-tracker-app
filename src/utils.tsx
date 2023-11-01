@@ -44,15 +44,21 @@ export const getDayColor = (
   theme: ITheme,
   progress?: IHistory['habits'][0],
 ) => {
-  return disabled
-    ? theme.colors.surface[200]
-    : progress
-    ? progress.completed
-      ? commonColors.green
-      : commonColors.red
-    : day.isBefore(moment().startOf('day'))
-    ? commonColors.orange
-    : theme.colors.disabledText;
+  const today = moment().startOf('day');
+
+  if (disabled) return theme.colors.surface[200];
+
+  if (progress) {
+    if (progress.completed) return commonColors.green;
+
+    if (day.isSame(today)) return commonColors.orange;
+
+    return commonColors.red;
+  }
+
+  if (day.isBefore(today)) return commonColors.orange;
+
+  return theme.colors.disabledText;
 };
 
 export const getDayColorAndIsDisabled = (
