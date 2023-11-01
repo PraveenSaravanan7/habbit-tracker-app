@@ -286,7 +286,6 @@ const styles = StyleSheet.create({
   container: {
     rowGap: 16,
     paddingHorizontal: 16,
-    paddingBottom: 200,
   },
   item: {
     // padding: 16,

@@ -28,7 +28,7 @@ export const Home = () => {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps={'handled'}>
-        <View style={{marginTop: 100}}>
+        <View style={styles.screenWrapper}>
           {activeTab === MAIN_TABS.TODAY && (
             <Today
               currentDate={currentDate}
@@ -47,4 +47,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  screenWrapper: {marginTop: 100, marginBottom: 200},
 });

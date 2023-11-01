@@ -162,7 +162,6 @@ export const Category = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 240,
     rowGap: 8,
   },
   listNameContainer: {
