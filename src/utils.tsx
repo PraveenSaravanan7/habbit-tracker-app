@@ -19,12 +19,17 @@ export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
   return `rgba(${r},${g},${b},${opacity})`;
 };
 
-export const isDayDisabled = (day: Moment, habit: THabit) => {
+export const isDayDisabled = (
+  day: Moment,
+  habit: THabit,
+  ignoreFutureCheck = false,
+) => {
   const startDate = moment(habit.startDate, 'DD/MM/YYYY');
   const {repeatConfig} = habit;
 
-  if (day.isBefore(startDate) || day.isAfter(moment().endOf('day')))
-    return true;
+  if (day.isBefore(startDate)) return true;
+
+  if (!ignoreFutureCheck && day.isAfter(moment().endOf('day'))) return true;
 
   if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
     return !repeatConfig.days.includes(day.format('ddd') as any);

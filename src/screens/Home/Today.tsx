@@ -22,10 +22,10 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
   const [categories, setCategories] = useState<Map<string, ICategory>>(
     new Map(),
   );
-  const [history, setHistory] = useState<IHistory[]>([]);
+  const [_, setHistory] = useState<IHistory[]>([]);
 
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress} = useHabitUpdate();
+  const {UpdateUi} = useHabitUpdate();
 
   useEffect(() => {
     setCategories(
@@ -58,7 +58,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
 
           return b.priority - a.priority;
         })
-        .filter(habit => !isDayDisabled(currentDate, habit)),
+        .filter(habit => !isDayDisabled(currentDate, habit, true)),
     );
 
     setHistory(JSON.parse(JSON.stringify(todayHistory)));
