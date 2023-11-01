@@ -1,21 +1,16 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  COMPARISON_TYPE,
-  HABIT_TYPES,
-  HISTORY_MODEL_EVENT,
-  THabit,
-} from '../database/models/habit';
+import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
 import getHistoryModel from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
-import database from '../database/database';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
   const [activeHabit, setActiveHabit] = useState<THabit>();
   const [activeDate, setActiveDate] = useState<string>('');
+  const [historyUpdated, setHistoryUpdated] = useState(0);
 
   const getHistoryRecord = useCallback(() => {
     const historyModel = getHistoryModel();
@@ -111,8 +106,7 @@ export const useHabitUpdate = () => {
 
       historyModel.update(record);
 
-      database.emit(HISTORY_MODEL_EVENT.UPDATE_HISTORY);
-
+      setHistoryUpdated(prev => prev + 1);
       setOpenModal(false);
       setActiveDate('');
       setActiveHabit(undefined);
@@ -180,5 +174,5 @@ export const useHabitUpdate = () => {
     return null;
   };
 
-  return {updateProgress, UpdateUi};
+  return {updateProgress, UpdateUi, historyUpdated};
 };

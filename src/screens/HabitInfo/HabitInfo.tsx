@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Header} from '../../components/Header';
 import {useRouter} from '../../../NavigationUtils';
@@ -7,9 +7,8 @@ import {Calendar} from '../../components/Calendar';
 import {useTheme} from '../../../ThemeProvider';
 import getHistoryModel, {IHistory} from '../../database/models/history';
 import {getDayColorAndIsDisabled} from '../../utils';
-import {HISTORY_MODEL_EVENT, THabit} from '../../database/models/habit';
+import {THabit} from '../../database/models/habit';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
-import database from '../../database/database';
 
 export enum HABIT_INFO_TAB {
   CALENDAR = 'Calendar',
@@ -31,18 +30,11 @@ export const HabitInfo = () => {
   const updateActiveTab = (selectedTab: string) =>
     setActiveTab(selectedTab as HABIT_INFO_TAB);
 
-  useEffect(() => {
-    const updateHistory = () =>
-      setHistory(() => JSON.parse(JSON.stringify(getHistoryModel().find())));
-
-    database.addListener(HISTORY_MODEL_EVENT.UPDATE_HISTORY, updateHistory);
-
-    return () =>
-      database.removeListener(
-        HISTORY_MODEL_EVENT.UPDATE_HISTORY,
-        updateHistory,
-      );
-  }, []);
+  const updateHistory = useCallback(
+    () =>
+      setHistory(() => JSON.parse(JSON.stringify(getHistoryModel().find()))),
+    [],
+  );
 
   return (
     <View>
@@ -62,7 +54,11 @@ export const HabitInfo = () => {
       />
       <View style={[styles.tabWrapper]}>
         {activeTab === HABIT_INFO_TAB.CALENDAR && (
-          <CalendarTab history={history} habit={habit} />
+          <CalendarTab
+            history={history}
+            habit={habit}
+            updateHistory={updateHistory}
+          />
         )}
       </View>
     </View>
@@ -72,12 +68,18 @@ export const HabitInfo = () => {
 const CalendarTab = ({
   history,
   habit,
+  updateHistory,
 }: {
   habit: THabit;
   history: IHistory[];
+  updateHistory: () => void;
 }) => {
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress} = useHabitUpdate();
+  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+
+  useEffect(() => {
+    updateHistory();
+  }, [historyUpdated, updateHistory]);
 
   return (
     <>

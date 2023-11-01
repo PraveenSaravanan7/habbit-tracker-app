@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
-  HISTORY_MODEL_EVENT,
   REPEAT_TYPE,
   THabit,
 } from '../../database/models/habit';
@@ -28,7 +27,7 @@ export const Habit = () => {
   const [history, setHistory] = useState<IHistory[]>([]);
 
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress} = useHabitUpdate();
+  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
 
   const getCategory = (habit: THabit) =>
     categories.find(category => category.id === habit.category);
@@ -85,16 +84,8 @@ export const Habit = () => {
   }, []);
 
   useEffect(() => {
-    const updateHistory = () => setHistory(() => fetchHistory());
-
-    database.addListener(HISTORY_MODEL_EVENT.UPDATE_HISTORY, updateHistory);
-
-    return () =>
-      database.removeListener(
-        HISTORY_MODEL_EVENT.UPDATE_HISTORY,
-        updateHistory,
-      );
-  }, [fetchHistory]);
+    setHistory(() => fetchHistory());
+  }, [historyUpdated, fetchHistory]);
 
   return (
     <>

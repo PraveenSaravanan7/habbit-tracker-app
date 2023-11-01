@@ -4,6 +4,8 @@ import {ITheme, commonColors} from '../themes';
 import {IHistory} from './database/models/history';
 
 export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
+  if (!hexCode.startsWith('#')) return hexCode;
+
   let hex = hexCode.replace('#', '');
 
   if (hex.length === 3)
@@ -56,7 +58,8 @@ export const getDayColor = (
   if (progress) {
     if (progress.completed) return commonColors.green;
 
-    if (day.isSame(today)) return commonColors.orange;
+    if (day.isSame(today) && progress.progress !== undefined)
+      return commonColors.orange;
 
     return commonColors.red;
   }
