@@ -51,7 +51,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
       }, new Map<string, boolean>()) || new Map<string, boolean>();
 
     setHabits(
-      allHabits
+      [...allHabits]
         .sort((a, b) => {
           if (completion.get(a.id) && !completion.get(b.id)) return 1;
           else if (!completion.get(a.id) && completion.get(b.id)) return -1;

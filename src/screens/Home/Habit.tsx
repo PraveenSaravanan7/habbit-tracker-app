@@ -69,7 +69,7 @@ export const Habit = () => {
 
   useEffect(() => {
     const updateHabit = () =>
-      setHabits(habitModel.find().sort((a, b) => b.priority - a.priority));
+      setHabits([...habitModel.find()].sort((a, b) => b.priority - a.priority));
 
     database.addListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
 
