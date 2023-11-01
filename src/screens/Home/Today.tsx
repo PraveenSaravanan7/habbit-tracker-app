@@ -79,7 +79,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
         <View
           style={[
             styles.progressButton,
-            {backgroundColor: theme.colors.surface[100]},
+            {backgroundColor: theme.colors.surface[200]},
           ]}>
           <MaterialCommunityIcons color={color} size={24} name="lock-outline" />
         </View>
