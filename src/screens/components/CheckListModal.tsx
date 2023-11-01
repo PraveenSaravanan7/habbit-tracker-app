@@ -37,16 +37,13 @@ export const CheckListModal = ({
     });
   };
 
-  const updateVisibilityWrapper = (visibility: boolean) => {
-    if (!visibility) updateChecked(checked);
-    updateVisibility(visibility);
+  const done = () => {
+    updateChecked(checked);
+    updateVisibility(false);
   };
 
   return (
-    <Modal
-      width={'80%'}
-      isVisible={isOpen}
-      updateVisibility={updateVisibilityWrapper}>
+    <Modal width={'80%'} isVisible={isOpen} updateVisibility={updateVisibility}>
       <View
         style={[
           styles.container,
@@ -70,24 +67,35 @@ export const CheckListModal = ({
             </Pressable>
           ))}
         </ScrollView>
-        <Pressable
-          style={[styles.button, {borderColor: theme.colors.surface[200]}]}
-          onPress={() => updateVisibilityWrapper(false)}>
-          <TextContent>DONE</TextContent>
-        </Pressable>
+        <View
+          style={[
+            styles.buttonWrapper,
+            {borderColor: theme.colors.surface[200]},
+          ]}>
+          <Pressable
+            style={[styles.button]}
+            onPress={() => updateVisibility(false)}>
+            <TextContent style={styles.buttonText}>CLOSE</TextContent>
+          </Pressable>
+          <Pressable style={[styles.button]} onPress={done}>
+            <TextContent style={styles.buttonText}>DONE</TextContent>
+          </Pressable>
+        </View>
       </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  buttonText: {fontFamily: 'Inter-Bold'},
+  buttonWrapper: {flexDirection: 'row', borderTopWidth: 1},
   container: {borderRadius: 20, height: 'auto'},
   textWrapper: {maxWidth: '85%'},
   button: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    borderTopWidth: 1,
   },
   item: {
     paddingHorizontal: 20,
