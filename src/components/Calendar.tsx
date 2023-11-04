@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 2,
   },
   dayItemContainer: {

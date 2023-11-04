@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
 import {Moment} from 'moment';
-import getHistoryModel from '../database/models/history';
+import getHistoryModel, {IHistory} from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
@@ -11,6 +11,18 @@ export const useHabitUpdate = () => {
   const [activeHabit, setActiveHabit] = useState<THabit>();
   const [activeDate, setActiveDate] = useState<string>('');
   const [historyUpdated, setHistoryUpdated] = useState(0);
+  const [progress, setProgress] =
+    useState<IHistory['habits']['0']['progress']>();
+
+  useEffect(() => {
+    const historyModel = getHistoryModel();
+
+    setProgress(
+      historyModel
+        .findOne({date: activeDate})
+        ?.habits.find(record => record.habitId === activeHabit?.id)?.progress,
+    );
+  }, [activeDate, activeHabit?.id]);
 
   const getHistoryRecord = useCallback(() => {
     const historyModel = getHistoryModel();
@@ -130,12 +142,6 @@ export const useHabitUpdate = () => {
   }, [activeHabit, updateProgressInDb]);
 
   const UpdateUi = () => {
-    const historyModel = getHistoryModel();
-
-    const progress = historyModel
-      .findOne({date: activeDate})
-      ?.habits.find(record => record.habitId === activeHabit?.id)?.progress;
-
     if (activeHabit?.habitType === HABIT_TYPES.NUMERIC)
       return (
         <NumberInputModal

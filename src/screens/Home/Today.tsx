@@ -9,8 +9,14 @@ import {useHabitUpdate} from '../../hooks/useHabitUpdate';
 import {TextContent} from '../../components/TextContent';
 import {CategoryIcon} from '../components/CategoryIcon';
 import {useTheme} from '../../../ThemeProvider';
-import {convertHexToRGBA, getDayColor, isDayDisabled} from '../../utils';
+import {
+  DAY_COLOR,
+  convertHexToRGBA,
+  getDayColor,
+  isDayDisabled,
+} from '../../utils';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {commonColors} from '../../../themes';
 
 export interface ITodayProps {
   currentDate: Moment;
@@ -18,6 +24,9 @@ export interface ITodayProps {
 }
 
 export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
+  const {theme} = useTheme();
+  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<Map<string, ICategory>>(
     new Map(),
@@ -25,9 +34,6 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
   const [history, setHistory] = useState<Map<string, IHistory['habits'][0]>>(
     new Map(),
   );
-
-  const {theme} = useTheme();
-  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
 
   useEffect(() => {
     setCategories(
@@ -59,8 +65,8 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
 
     setHabits(
       [...allHabits]
-        .sort((a, b) => b.priority - a.priority)
-        .filter(habit => !isDayDisabled(currentDate, habit, true)),
+        .filter(habit => !isDayDisabled(currentDate, habit, true))
+        .sort((a, b) => b.priority - a.priority),
     );
 
     setHistory(completion);
@@ -72,30 +78,45 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
   const ProgressButton = ({habit}: {habit: THabit}) => {
     const progress = history.get(habit.id);
 
-    const color = getDayColor(currentDate, false, theme, progress);
+    const colorMap: Record<DAY_COLOR, string[]> = {
+      [DAY_COLOR.COMPLETED]: [
+        convertHexToRGBA(commonColors.green, 0.2),
+        commonColors.green,
+      ],
+      [DAY_COLOR.DISABLED]: [
+        theme.colors.surface[200],
+        theme.colors.surface[400],
+      ],
+      [DAY_COLOR.IN_COMPLETE]: [
+        convertHexToRGBA(commonColors.red, 0.2),
+        commonColors.red,
+      ],
+      [DAY_COLOR.IN_PROGRESS]: [
+        convertHexToRGBA(commonColors.orange, 0.2),
+        commonColors.orange,
+      ],
+      [DAY_COLOR.NO_PROGRESS]: [theme.colors.surface[200]],
+      [DAY_COLOR.NO_PROGRESS_OLD]: [theme.colors.surface[200]],
+    };
+
+    const color = getDayColor(currentDate, false, colorMap, progress);
 
     if (currentDate.isAfter(moment().startOf('day')))
       return (
-        <View
-          style={[
-            styles.progressButton,
-            {backgroundColor: theme.colors.surface[200]},
-          ]}>
-          <MaterialCommunityIcons color={color} size={24} name="lock-outline" />
+        <View style={[styles.progressButton, {backgroundColor: color[0]}]}>
+          <MaterialCommunityIcons
+            color={color[1]}
+            size={24}
+            name="lock-outline"
+          />
         </View>
       );
 
     return (
-      <Pressable
-        style={[
-          styles.progressButton,
-          {backgroundColor: convertHexToRGBA(color, 0.2)},
-        ]}
-        onPress={() => updateProgress(habit, currentDate)}>
-        {/* <TextContent>{color}</TextContent> */}
+      <View style={[styles.progressButton, {backgroundColor: color[0]}]}>
         {progress && (
           <MaterialCommunityIcons
-            color={color}
+            color={color[1]}
             size={24}
             name={
               progress.completed
@@ -106,7 +127,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
             }
           />
         )}
-      </Pressable>
+      </View>
     );
   };
 
@@ -121,8 +142,9 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
           const category = categories.get(habit.category) as ICategory;
 
           return (
-            <View
+            <Pressable
               key={habit.id}
+              onPress={() => updateProgress(habit, currentDate)}
               style={[
                 styles.item,
                 {borderBottomColor: theme.colors.surface[100]},
@@ -160,7 +182,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
                 </View>
               </View>
               <ProgressButton habit={habit} />
-            </View>
+            </Pressable>
           );
         })}
       </View>

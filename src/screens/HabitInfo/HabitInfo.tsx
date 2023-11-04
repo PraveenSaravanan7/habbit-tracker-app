@@ -6,9 +6,10 @@ import {CategoryIcon} from '../components/CategoryIcon';
 import {Calendar} from '../../components/Calendar';
 import {useTheme} from '../../../ThemeProvider';
 import getHistoryModel, {IHistory} from '../../database/models/history';
-import {getDayColorAndIsDisabled} from '../../utils';
+import {DAY_COLOR, getDayColorAndIsDisabled} from '../../utils';
 import {THabit} from '../../database/models/habit';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
+import {commonColors} from '../../../themes';
 
 export enum HABIT_INFO_TAB {
   CALENDAR = 'Calendar',
@@ -77,6 +78,15 @@ const CalendarTab = ({
   const {theme} = useTheme();
   const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
 
+  const colorMap: Record<DAY_COLOR, string[]> = {
+    [DAY_COLOR.COMPLETED]: [commonColors.green],
+    [DAY_COLOR.DISABLED]: [theme.colors.surface[200]],
+    [DAY_COLOR.IN_COMPLETE]: [commonColors.red],
+    [DAY_COLOR.IN_PROGRESS]: [commonColors.orange],
+    [DAY_COLOR.NO_PROGRESS]: [theme.colors.surface[500]],
+    [DAY_COLOR.NO_PROGRESS_OLD]: [commonColors.orange],
+  };
+
   useEffect(() => {
     updateHistory();
   }, [historyUpdated, updateHistory]);
@@ -88,7 +98,7 @@ const CalendarTab = ({
           updateCurrentDate={day => updateProgress(habit, day)}
           backgroundColor={theme.colors.background}
           getDayColorAndIsDisabled={day =>
-            getDayColorAndIsDisabled(day, habit, theme, history)
+            getDayColorAndIsDisabled(day, habit, colorMap, history)
           }
         />
       </ScrollView>

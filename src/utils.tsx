@@ -1,6 +1,5 @@
 import moment, {Moment} from 'moment';
 import {REPEAT_TYPE, THabit} from './database/models/habit';
-import {ITheme, commonColors} from '../themes';
 import {IHistory} from './database/models/history';
 
 export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
@@ -45,34 +44,44 @@ export const isDayDisabled = (
   return false;
 };
 
+export enum DAY_COLOR {
+  DISABLED,
+  COMPLETED,
+  IN_COMPLETE,
+  IN_PROGRESS,
+  NO_PROGRESS,
+  NO_PROGRESS_OLD,
+}
+
 export const getDayColor = (
   day: Moment,
   disabled: boolean,
-  theme: ITheme,
-  progress?: IHistory['habits'][0],
-) => {
+  colorMap: Record<DAY_COLOR, string[]>,
+  progressInfo?: IHistory['habits'][0],
+): string[] => {
   const today = moment().startOf('day');
 
-  if (disabled) return theme.colors.surface[200];
+  if (disabled) return colorMap[DAY_COLOR.DISABLED];
 
-  if (progress) {
-    if (progress.completed) return commonColors.green;
+  if (progressInfo?.completed) return colorMap[DAY_COLOR.COMPLETED];
 
-    if (day.isSame(today) && progress.progress !== undefined)
-      return commonColors.orange;
+  if (progressInfo) {
+    // INFO: Non yes or no tasks
+    if (day.isSame(today) && progressInfo.progress)
+      return colorMap[DAY_COLOR.IN_PROGRESS];
 
-    return commonColors.red;
+    return colorMap[DAY_COLOR.IN_COMPLETE];
   }
 
-  if (day.isBefore(today)) return commonColors.orange;
+  if (day.isBefore(today)) return colorMap[DAY_COLOR.NO_PROGRESS_OLD];
 
-  return theme.colors.disabledText;
+  return colorMap[DAY_COLOR.NO_PROGRESS];
 };
 
 export const getDayColorAndIsDisabled = (
   day: Moment,
   habit: THabit,
-  theme: ITheme,
+  colorMap: Record<DAY_COLOR, string[]>,
   history: IHistory[],
 ) => {
   const progress = history
@@ -81,7 +90,7 @@ export const getDayColorAndIsDisabled = (
 
   const disabled = isDayDisabled(day, habit);
 
-  const color = getDayColor(day, disabled, theme, progress);
+  const color = getDayColor(day, disabled, colorMap, progress);
 
-  return {disabled, color};
+  return {disabled, color: color[0]};
 };

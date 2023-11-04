@@ -10,13 +10,18 @@ import database from '../../database/database';
 import {useTheme} from '../../../ThemeProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import getCategoryModel, {ICategory} from '../../database/models/category';
-import {convertHexToRGBA, getDayColorAndIsDisabled} from '../../utils';
+import {
+  DAY_COLOR,
+  convertHexToRGBA,
+  getDayColorAndIsDisabled,
+} from '../../utils';
 import moment, {Moment} from 'moment';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
 import getHistoryModel, {IHistory} from '../../database/models/history';
 import {useNavigator} from '../../../NavigationUtils';
 import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
 import {CategoryIcon} from '../components/CategoryIcon';
+import {commonColors} from '../../../themes';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -235,13 +240,22 @@ interface IDaysProps {
 const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
   const {theme} = useTheme();
 
+  const colorMap: Record<DAY_COLOR, string[]> = {
+    [DAY_COLOR.COMPLETED]: [commonColors.green],
+    [DAY_COLOR.DISABLED]: [theme.colors.surface[200]],
+    [DAY_COLOR.IN_COMPLETE]: [commonColors.red],
+    [DAY_COLOR.IN_PROGRESS]: [commonColors.orange],
+    [DAY_COLOR.NO_PROGRESS]: [theme.colors.surface[500]],
+    [DAY_COLOR.NO_PROGRESS_OLD]: [commonColors.orange],
+  };
+
   return (
     <View style={[styles.daysContainer]}>
       {days.map((day, index) => {
         const {disabled, color} = getDayColorAndIsDisabled(
           day,
           habit,
-          theme,
+          colorMap,
           history,
         );
         const opacity = disabled ? 0.4 : 1;
