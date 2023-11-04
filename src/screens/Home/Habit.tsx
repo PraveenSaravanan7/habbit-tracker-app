@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     aspectRatio: 1,
     padding: 6,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 2,
   },
   itemBottom: {
