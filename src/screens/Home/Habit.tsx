@@ -22,6 +22,7 @@ import {useNavigator} from '../../../NavigationUtils';
 import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
 import {CategoryIcon} from '../components/CategoryIcon';
 import {commonColors} from '../../../themes';
+import {Modal} from '../../components/Modal';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -30,6 +31,7 @@ export const Habit = () => {
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [history, setHistory] = useState<IHistory[]>([]);
+  const [activeHabit, setActiveHabit] = useState<THabit>();
 
   const {theme} = useTheme();
   const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
@@ -101,7 +103,8 @@ export const Habit = () => {
           if (!category) return null;
 
           return (
-            <View
+            <Pressable
+              onPress={() => setActiveHabit(habit)}
               style={[
                 styles.item,
                 {backgroundColor: theme.colors.surface[100]},
@@ -119,11 +122,19 @@ export const Habit = () => {
                 history={history}
               />
               <BottomMenu habit={habit} category={category} />
-            </View>
+            </Pressable>
           );
         })}
       </View>
       <UpdateUi />
+      {activeHabit && (
+        <InfoModel
+          repeatInfo={getRepeatText(activeHabit) || ''}
+          habit={activeHabit}
+          category={getCategory(activeHabit) as ICategory}
+          onClose={() => setActiveHabit(undefined)}
+        />
+      )}
     </>
   );
 };
@@ -278,12 +289,117 @@ const Days = ({habit, updateProgress, days, history}: IDaysProps) => {
                   borderColor: color,
                 },
               ]}>
-              <TextContent>{day.date()}</TextContent>
+              <TextContent style={styles.dateContainerText}>
+                {day.date()}
+              </TextContent>
             </View>
           </Pressable>
         );
       })}
     </View>
+  );
+};
+
+interface IInfoModelProps {
+  habit: THabit;
+  category: ICategory;
+  repeatInfo: string;
+  onClose: () => void;
+}
+
+const InfoModel = ({habit, onClose, category, repeatInfo}: IInfoModelProps) => {
+  const {theme} = useTheme();
+  const {navigate} = useNavigator();
+
+  // eslint-disable-next-line react/no-unstable-nested-components
+  const Item = ({
+    name,
+    iconName,
+    onPress,
+    borderTop = 0,
+  }: {
+    name: string;
+    iconName: string;
+    onPress: () => void;
+    borderTop?: number;
+  }) => (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.menuItem,
+        {
+          borderTopWidth: borderTop,
+          borderTopColor: theme.colors.surface[200],
+        },
+      ]}>
+      <MaterialCommunityIcons
+        name={iconName}
+        size={24}
+        color={theme.colors.disabledText}
+      />
+      <TextContent style={styles.menuItemText}>{name}</TextContent>
+    </Pressable>
+  );
+
+  return (
+    <Modal
+      isVisible={!!habit}
+      updateVisibility={visibility => {
+        if (!visibility) onClose();
+      }}
+      placeContentAtBottom={true}>
+      <View
+        style={[
+          styles.modalContainer,
+          {backgroundColor: theme.colors.surface[100]},
+        ]}>
+        <Title habit={habit} category={category} repeatInfo={repeatInfo} />
+        <Item
+          name="Calendar"
+          iconName="calendar-outline"
+          onPress={() => {
+            onClose();
+            navigate('HabitInfo', {
+              category,
+              habit,
+              tab: HABIT_INFO_TAB.CALENDAR,
+            });
+          }}
+          borderTop={1}
+        />
+        <Item
+          name="Statistics"
+          iconName="chart-line"
+          onPress={() => {
+            onClose();
+            navigate('HabitInfo', {
+              category,
+              habit,
+              tab: HABIT_INFO_TAB.STATS,
+            });
+          }}
+        />
+        <Item
+          name="Edit"
+          iconName="pencil-outline"
+          onPress={() => {
+            onClose();
+            navigate('HabitInfo', {
+              category,
+              habit,
+              tab: HABIT_INFO_TAB.EDIT,
+            });
+          }}
+        />
+        <Item
+          name="Archive"
+          iconName="archive-arrow-down-outline"
+          onPress={() => {}}
+          borderTop={1}
+        />
+        <Item name="Delete" iconName="trash-can-outline" onPress={() => {}} />
+      </View>
+    </Modal>
   );
 };
 
@@ -299,6 +415,7 @@ const styles = StyleSheet.create({
   itemTop: {
     paddingVertical: 8,
     paddingHorizontal: 12,
+    paddingBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -332,9 +449,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'center',
-    columnGap: 10,
+    columnGap: 12,
     paddingHorizontal: 16,
-    paddingTop: 4,
+    // paddingTop: 4,
     paddingBottom: 12,
   },
   dayItem: {
@@ -347,12 +464,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter-Light',
   },
+  dateContainerText: {fontSize: 12, fontFamily: 'Inter-SemiBold'},
   dateContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     aspectRatio: 1,
     padding: 6,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
   },
   itemBottom: {
@@ -377,5 +495,20 @@ const styles = StyleSheet.create({
   bottomMenuItemText: {
     fontSize: 12,
     fontFamily: 'Inter-Bold',
+  },
+  modalContainer: {
+    flexDirection: 'column',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  menuItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    columnGap: 20,
+    alignItems: 'center',
+  },
+  menuItemText: {
+    fontSize: 14,
   },
 });
