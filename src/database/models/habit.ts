@@ -93,7 +93,7 @@ interface IRepeatConfig<
 interface IHabitBase<
   HabitType extends HABIT_TYPES,
   HabitConfig extends Record<string, string | string[] | number> | undefined,
-> {
+> extends Partial<LokiObj> {
   id: string;
   habitType: HabitType;
   habitConfig?: HabitConfig;

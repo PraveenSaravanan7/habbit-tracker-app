@@ -1,7 +1,7 @@
 import COLLECTION from '../collections';
 import database from '../database';
 
-export interface IHistory {
+export interface IHistory extends Partial<LokiObj> {
   date: string;
   habits: {
     habitId: string;

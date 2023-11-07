@@ -166,15 +166,13 @@ const YearAndMonthModal = ({
   );
 };
 
-const Header = ({
-  month,
-  moveMonth,
-  moveYear,
-}: {
+interface IHeaderProps {
   month: Moment;
   moveMonth: (n: number) => void;
   moveYear: (n: number) => void;
-}) => {
+}
+
+const Header = ({month, moveMonth, moveYear}: IHeaderProps) => {
   const {theme} = useTheme();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -213,13 +211,7 @@ const Header = ({
   );
 };
 
-const Grid = ({
-  month,
-  selectedDate,
-  updateCurrentDate,
-  startDate,
-  getDayColorAndIsDisabled,
-}: {
+interface IGridProps {
   month: Moment;
   selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
@@ -228,7 +220,15 @@ const Grid = ({
     color: string;
     disabled: boolean;
   };
-}) => {
+}
+
+const Grid = ({
+  month,
+  selectedDate,
+  updateCurrentDate,
+  startDate,
+  getDayColorAndIsDisabled,
+}: IGridProps) => {
   const {theme} = useTheme();
 
   const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -263,13 +263,7 @@ const Grid = ({
   );
 };
 
-const Days = ({
-  month,
-  selectedDate,
-  updateCurrentDate,
-  startDate: startDateProp,
-  getDayColorAndIsDisabled,
-}: {
+interface IDaysProps {
   month: Moment;
   selectedDate?: Moment;
   updateCurrentDate: (date: Moment) => void;
@@ -278,65 +272,94 @@ const Days = ({
     color: string;
     disabled: boolean;
   };
-}) => {
-  const {theme} = useTheme();
+}
 
-  const Item = useCallback(
-    ({day}: {day: Moment}) => {
-      const {color, disabled} = getDayColorAndIsDisabled
-        ? getDayColorAndIsDisabled(day)
-        : {color: '', disabled: false};
-
-      const isDisabled =
-        disabled || (startDateProp ? day.isBefore(startDateProp) : false);
-      const backgroundColor = selectedDate?.isSame(day)
-        ? theme.colors.primary[100]
-        : theme.colors.surface[200];
-      const opacity = day.month() === month.month() && !isDisabled ? 1 : 0.25;
-      const fontFamily = selectedDate?.isSame(day)
-        ? 'Inter-Bold'
-        : 'Inter-Regular';
-      const borderColor = color || backgroundColor;
-
-      return (
-        <Pressable
-          disabled={isDisabled || day.month() !== month.month()}
-          style={[styles.dayItem, {backgroundColor, opacity, borderColor}]}
-          onPress={() => updateCurrentDate(day)}>
-          <TextContent style={{fontFamily}}>{day.format('DD')}</TextContent>
-        </Pressable>
-      );
-    },
-    [
-      theme,
-      month,
-      selectedDate,
-      updateCurrentDate,
-      startDateProp,
-      getDayColorAndIsDisabled,
-    ],
-  );
-
+const Days = ({
+  month,
+  selectedDate,
+  updateCurrentDate,
+  startDate: startDateProp,
+  getDayColorAndIsDisabled,
+}: IDaysProps) => {
   const startDate = moment(month).subtract(month.weekday(), 'days');
-  const daysList: JSX.Element[][] = [];
-  const total = 6 * 7;
 
-  for (let i = 0; i < total; i++) {
-    const y = Math.floor(i / 7);
+  const getDaysList = useCallback(() => {
+    const daysList: JSX.Element[][] = [];
+    const total = 6 * 7;
 
-    if (!daysList[y]) daysList[y] = [];
+    for (let i = 0; i < total; i++) {
+      const y = Math.floor(i / 7);
 
-    daysList[y].push(<Item key={i} day={moment(startDate).add(i, 'day')} />);
-  }
+      if (!daysList[y]) daysList[y] = [];
+
+      daysList[y].push(
+        <DayItem
+          selectedDate={selectedDate}
+          startDate={startDateProp}
+          month={month}
+          updateCurrentDate={updateCurrentDate}
+          getDayColorAndIsDisabled={getDayColorAndIsDisabled}
+          key={i}
+          day={moment(startDate).add(i, 'day')}
+        />,
+      );
+    }
+
+    return daysList;
+  }, [
+    getDayColorAndIsDisabled,
+    month,
+    selectedDate,
+    startDate,
+    startDateProp,
+    updateCurrentDate,
+  ]);
 
   return (
     <View style={[styles.daysContainer]}>
-      {daysList.map((list, index) => (
+      {getDaysList().map((list, index) => (
         <View style={[styles.dayItemContainer]} key={index}>
           {list}
         </View>
       ))}
     </View>
+  );
+};
+
+interface IDayItemProps extends IDaysProps {
+  day: Moment;
+}
+
+const DayItem = ({
+  day,
+  getDayColorAndIsDisabled,
+  startDate: startDateProp,
+  selectedDate,
+  month,
+  updateCurrentDate,
+}: IDayItemProps) => {
+  const {theme} = useTheme();
+
+  const {color, disabled} = getDayColorAndIsDisabled
+    ? getDayColorAndIsDisabled(day)
+    : {color: '', disabled: false};
+
+  const isDisabled =
+    disabled || (startDateProp ? day.isBefore(startDateProp) : false);
+  const backgroundColor = selectedDate?.isSame(day)
+    ? theme.colors.primary[100]
+    : theme.colors.surface[200];
+  const opacity = day.month() === month.month() && !isDisabled ? 1 : 0.25;
+  const fontFamily = selectedDate?.isSame(day) ? 'Inter-Bold' : 'Inter-Regular';
+  const borderColor = color || backgroundColor;
+
+  return (
+    <Pressable
+      disabled={isDisabled || day.month() !== month.month()}
+      style={[styles.dayItem, {backgroundColor, opacity, borderColor}]}
+      onPress={() => updateCurrentDate(day)}>
+      <TextContent style={{fontFamily}}>{day.format('DD')}</TextContent>
+    </Pressable>
   );
 };
 

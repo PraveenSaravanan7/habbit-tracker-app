@@ -23,6 +23,7 @@ import {HABIT_INFO_TAB} from '../HabitInfo/HabitInfo';
 import {CategoryIcon} from '../components/CategoryIcon';
 import {commonColors} from '../../../themes';
 import {Modal} from '../../components/Modal';
+import {ConfirmationModal} from '../components/ConfirmationModal';
 
 export const Habit = () => {
   const habitModel = getHabitModel();
@@ -73,15 +74,23 @@ export const Habit = () => {
     [days],
   );
 
-  useEffect(() => {
-    const updateHabit = () =>
-      setHabits([...habitModel.find()].sort((a, b) => b.priority - a.priority));
+  const updateHabit = useCallback(
+    () =>
+      setHabits([...habitModel.find()].sort((a, b) => b.priority - a.priority)),
+    [habitModel],
+  );
 
+  const onDelete = (habit: THabit) => {
+    habitModel.remove(habit?.$loki || 0);
+    updateHabit();
+  };
+
+  useEffect(() => {
     database.addListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
 
     return () =>
       database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
-  }, [habitModel]);
+  }, [updateHabit]);
 
   useEffect(() => {
     setHabits(habitModel.find());
@@ -133,6 +142,7 @@ export const Habit = () => {
           habit={activeHabit}
           category={getCategory(activeHabit) as ICategory}
           onClose={() => setActiveHabit(undefined)}
+          onDelete={onDelete}
         />
       )}
     </>
@@ -305,11 +315,20 @@ interface IInfoModelProps {
   category: ICategory;
   repeatInfo: string;
   onClose: () => void;
+  onDelete: (habit: THabit) => void;
 }
 
-const InfoModel = ({habit, onClose, category, repeatInfo}: IInfoModelProps) => {
+const InfoModel = ({
+  habit,
+  onClose,
+  category,
+  repeatInfo,
+  onDelete,
+}: IInfoModelProps) => {
   const {theme} = useTheme();
   const {navigate} = useNavigator();
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   // eslint-disable-next-line react/no-unstable-nested-components
   const Item = ({
@@ -342,64 +361,82 @@ const InfoModel = ({habit, onClose, category, repeatInfo}: IInfoModelProps) => {
   );
 
   return (
-    <Modal
-      isVisible={!!habit}
-      updateVisibility={visibility => {
-        if (!visibility) onClose();
-      }}
-      placeContentAtBottom={true}>
-      <View
-        style={[
-          styles.modalContainer,
-          {backgroundColor: theme.colors.surface[100]},
-        ]}>
-        <Title habit={habit} category={category} repeatInfo={repeatInfo} />
-        <Item
-          name="Calendar"
-          iconName="calendar-outline"
-          onPress={() => {
-            onClose();
-            navigate('HabitInfo', {
-              category,
-              habit,
-              tab: HABIT_INFO_TAB.CALENDAR,
-            });
-          }}
-          borderTop={1}
-        />
-        <Item
-          name="Statistics"
-          iconName="chart-line"
-          onPress={() => {
-            onClose();
-            navigate('HabitInfo', {
-              category,
-              habit,
-              tab: HABIT_INFO_TAB.STATS,
-            });
-          }}
-        />
-        <Item
-          name="Edit"
-          iconName="pencil-outline"
-          onPress={() => {
-            onClose();
-            navigate('HabitInfo', {
-              category,
-              habit,
-              tab: HABIT_INFO_TAB.EDIT,
-            });
-          }}
-        />
-        <Item
-          name="Archive"
-          iconName="archive-arrow-down-outline"
-          onPress={() => {}}
-          borderTop={1}
-        />
-        <Item name="Delete" iconName="trash-can-outline" onPress={() => {}} />
-      </View>
-    </Modal>
+    <>
+      <Modal
+        isVisible={!!habit}
+        updateVisibility={visibility => {
+          if (!visibility) onClose();
+        }}
+        placeContentAtBottom={true}>
+        <View
+          style={[
+            styles.modalContainer,
+            {backgroundColor: theme.colors.surface[100]},
+          ]}>
+          <Title habit={habit} category={category} repeatInfo={repeatInfo} />
+          <Item
+            name="Calendar"
+            iconName="calendar-outline"
+            onPress={() => {
+              onClose();
+              navigate('HabitInfo', {
+                category,
+                habit,
+                tab: HABIT_INFO_TAB.CALENDAR,
+              });
+            }}
+            borderTop={1}
+          />
+          <Item
+            name="Statistics"
+            iconName="chart-line"
+            onPress={() => {
+              onClose();
+              navigate('HabitInfo', {
+                category,
+                habit,
+                tab: HABIT_INFO_TAB.STATS,
+              });
+            }}
+          />
+          <Item
+            name="Edit"
+            iconName="pencil-outline"
+            onPress={() => {
+              onClose();
+              navigate('HabitInfo', {
+                category,
+                habit,
+                tab: HABIT_INFO_TAB.EDIT,
+              });
+            }}
+          />
+          <Item
+            name="Archive"
+            iconName="archive-arrow-down-outline"
+            onPress={() => {}}
+            borderTop={1}
+          />
+          <Item
+            name="Delete"
+            iconName="trash-can-outline"
+            onPress={() => setOpenDeleteModal(true)}
+          />
+        </View>
+      </Modal>
+
+      <ConfirmationModal
+        text="Delete Habit?"
+        color={commonColors.red}
+        isOpen={openDeleteModal}
+        onOk={() => {
+          onDelete(habit);
+          setOpenDeleteModal(false);
+          onClose();
+        }}
+        onCancel={() => setOpenDeleteModal(false)}
+      />
+    </>
   );
 };
 
@@ -421,7 +458,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   habitName: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Inter-SemiBold',
   },
   icon: {
@@ -462,7 +499,7 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: 10,
-    fontFamily: 'Inter-Light',
+    fontFamily: 'Inter-Medium',
   },
   dateContainerText: {fontSize: 12, fontFamily: 'Inter-SemiBold'},
   dateContainer: {
