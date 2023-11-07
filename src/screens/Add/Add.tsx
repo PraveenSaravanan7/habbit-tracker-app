@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -26,6 +26,8 @@ import {SelectStartDate} from './SelectStartDate';
 import moment from 'moment';
 import {HABIT_MODEL_EVENT, emitDatabaseEvent} from '../../database/database';
 import {v4 as uuid} from 'uuid';
+import {ConfirmationModal} from '../components/ConfirmationModal';
+import {commonColors} from '../../../themes';
 
 enum SCREENS {
   SELECT_CATEGORY = 1,
@@ -37,7 +39,11 @@ enum SCREENS {
 
 export const Add = () => {
   const {theme} = useTheme();
-  const {goBack} = useNavigator();
+  const {
+    addListener: addNavigationListener,
+    dispatch: dispatchNavigation,
+    goBack,
+  } = useNavigator();
   const insets = useSafeAreaInsets();
 
   const backgroundColor = theme.colors.surface[100];
@@ -67,6 +73,7 @@ export const Add = () => {
   );
   const [endDate, setEndDate] = useState('');
   const [priority, setPriority] = useState(1);
+  const [discardModal, setDiscardModal] = useState<any>();
 
   const updateName = (name: string) => setNameTextInput(name);
   const updateDescription = (val: string) => setDescription(val);
@@ -223,6 +230,14 @@ export const Add = () => {
     activeScreen === SCREENS.SELECT_CATEGORY ||
     activeScreen === SCREENS.SELECT_HABIT_TYPE;
 
+  useEffect(() => {
+    addNavigationListener('beforeRemove', e => {
+      e.preventDefault();
+
+      setDiscardModal(e);
+    });
+  }, [addNavigationListener]);
+
   return (
     <>
       <ScrollView
@@ -318,6 +333,16 @@ export const Add = () => {
           </Pressable>
         )}
       </View>
+      <ConfirmationModal
+        text="Discard the new Habit?"
+        color={commonColors.red}
+        isOpen={Boolean(discardModal)}
+        onCancel={() => setDiscardModal(undefined)}
+        onOk={() => {
+          dispatchNavigation(discardModal.data.action);
+          setDiscardModal(undefined);
+        }}
+      />
     </>
   );
 };

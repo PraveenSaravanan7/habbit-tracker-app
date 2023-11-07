@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
 import getHistoryModel, {IHistory} from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
@@ -130,6 +130,8 @@ export const useHabitUpdate = () => {
   );
 
   const updateProgress = useCallback((habit: THabit, date: Moment) => {
+    if (date.isAfter(moment().startOf('day'))) return;
+
     setActiveHabit(habit);
     setActiveDate(date.format('DD/MM/YYYY'));
 
