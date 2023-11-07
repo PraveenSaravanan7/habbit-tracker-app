@@ -350,7 +350,7 @@ const DayItem = ({
     ? theme.colors.primary[100]
     : theme.colors.surface[200];
   const opacity = day.month() === month.month() && !isDisabled ? 1 : 0.25;
-  const fontFamily = selectedDate?.isSame(day) ? 'Inter-Bold' : 'Inter-Regular';
+  const fontFamily = selectedDate?.isSame(day) ? 'Inter-Bold' : 'Inter-Medium';
   const borderColor = color || backgroundColor;
 
   return (
