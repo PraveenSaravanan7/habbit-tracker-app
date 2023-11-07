@@ -460,6 +460,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
     borderWidth: 2,
+    margin: 2,
   },
   dayItemContainer: {
     width: '100%',
