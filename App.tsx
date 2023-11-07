@@ -8,6 +8,7 @@ import {Add} from './src/screens/Add/Add';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import database from './src/database/database';
 import {HabitInfo} from './src/screens/HabitInfo/HabitInfo';
+import {Archived} from './src/screens/HabitInfo/Archived';
 
 function App(): JSX.Element {
   const {theme} = useTheme();
@@ -49,6 +50,7 @@ function App(): JSX.Element {
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Add" component={Add} />
           <Stack.Screen name="HabitInfo" component={HabitInfo} />
+          <Stack.Screen name="Archived" component={Archived} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

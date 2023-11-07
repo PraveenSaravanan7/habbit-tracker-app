@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
-  REPEAT_TYPE,
   THabit,
 } from '../../database/models/habit';
 import {TextContent} from '../../components/TextContent';
@@ -14,6 +13,7 @@ import {
   DAY_COLOR,
   convertHexToRGBA,
   getDayColorAndIsDisabled,
+  getRepeatText,
 } from '../../utils';
 import moment, {Moment} from 'moment';
 import {useHabitUpdate} from '../../hooks/useHabitUpdate';
@@ -26,9 +26,6 @@ import {Modal} from '../../components/Modal';
 import {ConfirmationModal} from '../components/ConfirmationModal';
 
 export const Habit = () => {
-  const habitModel = getHabitModel();
-  const categoryModel = getCategoryModel();
-
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [history, setHistory] = useState<IHistory[]>([]);
@@ -39,19 +36,6 @@ export const Habit = () => {
 
   const getCategory = (habit: THabit) =>
     categories.find(category => category.id === habit.category);
-
-  const getRepeatText = ({repeatConfig}: THabit) => {
-    if (repeatConfig.repeatType === REPEAT_TYPE.EVERY_DAY) return 'Every day';
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
-      return repeatConfig.days.join('-');
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH)
-      return 'Days of the month: ' + repeatConfig.days.join(', ');
-
-    if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
-      return repeatConfig.days.join(', ');
-  };
 
   const days = useMemo(() => {
     const list: Moment[] = [];
@@ -74,14 +58,22 @@ export const Habit = () => {
     [days],
   );
 
-  const updateHabit = useCallback(
-    () =>
-      setHabits([...habitModel.find()].sort((a, b) => b.priority - a.priority)),
-    [habitModel],
-  );
+  const updateHabit = () =>
+    setHabits(() =>
+      [...getHabitModel().find()]
+        .filter(habit => !habit.archived)
+        .sort((a, b) => b.priority - a.priority),
+    );
 
   const onDelete = (habit: THabit) => {
-    habitModel.remove(habit?.$loki || 0);
+    getHabitModel().remove(habit?.$loki || 0);
+    updateHabit();
+  };
+
+  const archive = (habit: THabit) => {
+    habit.archived = true;
+    console.log(habit);
+    getHabitModel().update(habit);
     updateHabit();
   };
 
@@ -90,11 +82,11 @@ export const Habit = () => {
 
     return () =>
       database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
-  }, [updateHabit]);
+  }, []);
 
   useEffect(() => {
-    setHabits(habitModel.find());
-    setCategories(categoryModel.find());
+    updateHabit();
+    setCategories(getCategoryModel().find());
     setHistory(() => fetchHistory());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -143,6 +135,7 @@ export const Habit = () => {
           category={getCategory(activeHabit) as ICategory}
           onClose={() => setActiveHabit(undefined)}
           onDelete={onDelete}
+          archive={archive}
         />
       )}
     </>
@@ -316,6 +309,7 @@ interface IInfoModelProps {
   repeatInfo: string;
   onClose: () => void;
   onDelete: (habit: THabit) => void;
+  archive: (habit: THabit) => void;
 }
 
 const InfoModel = ({
@@ -324,6 +318,7 @@ const InfoModel = ({
   category,
   repeatInfo,
   onDelete,
+  archive,
 }: IInfoModelProps) => {
   const {theme} = useTheme();
   const {navigate} = useNavigator();
@@ -414,7 +409,10 @@ const InfoModel = ({
           <Item
             name="Archive"
             iconName="archive-arrow-down-outline"
-            onPress={() => {}}
+            onPress={() => {
+              archive(habit);
+              onClose();
+            }}
             borderTop={1}
           />
           <Item

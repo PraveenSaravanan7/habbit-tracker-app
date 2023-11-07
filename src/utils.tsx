@@ -94,3 +94,16 @@ export const getDayColorAndIsDisabled = (
 
   return {disabled, color: color[0]};
 };
+
+export const getRepeatText = ({repeatConfig}: THabit) => {
+  if (repeatConfig.repeatType === REPEAT_TYPE.EVERY_DAY) return 'Every day';
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
+    return repeatConfig.days.join('-');
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH)
+    return 'Days of the month: ' + repeatConfig.days.join(', ');
+
+  if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
+    return repeatConfig.days.join(', ');
+};

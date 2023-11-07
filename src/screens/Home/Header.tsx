@@ -7,6 +7,7 @@ import {TextContent} from '../../components/TextContent';
 import {MAIN_TABS} from './types';
 import moment, {Moment} from 'moment';
 import {CalendarModal} from '../components/CalendarModal';
+import {useNavigator} from '../../../NavigationUtils';
 
 interface IHeaderProps {
   activeTab: MAIN_TABS;
@@ -20,6 +21,7 @@ export const Header = ({
   updateCurrentDate,
 }: IHeaderProps) => {
   const {theme} = useTheme();
+  const {navigate} = useNavigator();
 
   const title = (() => {
     if (activeTab !== MAIN_TABS.TODAY) return activeTab;
@@ -60,13 +62,24 @@ export const Header = ({
               size={28}
             />
           </Pressable>
-          <Pressable onPress={() => updateCalendarModalVisibility(true)}>
-            <MaterialCommunityIcons
-              name="calendar-outline"
-              color={theme.colors.text}
-              size={28}
-            />
-          </Pressable>
+          {activeTab === MAIN_TABS.TODAY && (
+            <Pressable onPress={() => updateCalendarModalVisibility(true)}>
+              <MaterialCommunityIcons
+                name="calendar-outline"
+                color={theme.colors.text}
+                size={28}
+              />
+            </Pressable>
+          )}
+          {activeTab === MAIN_TABS.HABIT && (
+            <Pressable onPress={() => navigate('Archived')}>
+              <MaterialCommunityIcons
+                name="archive-arrow-down-outline"
+                color={theme.colors.text}
+                size={28}
+              />
+            </Pressable>
+          )}
         </View>
       </View>
 

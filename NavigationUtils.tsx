@@ -14,6 +14,7 @@ export type TStackScreens = {
   Add: undefined;
   Search: {text: string};
   HabitInfo: {habit: THabit; category: ICategory; tab: HABIT_INFO_TAB};
+  Archived: undefined;
 };
 
 export type TStackNavigation = NavigationProp<TStackScreens>;
