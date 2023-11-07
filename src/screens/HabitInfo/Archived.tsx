@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
@@ -32,6 +32,12 @@ export const Archived = () => {
     getHabitModel().update(habit);
     updateHabit();
     database.emit(HABIT_MODEL_EVENT.ADD_HABIT);
+
+    ToastAndroid.showWithGravity(
+      'Unarchived',
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+    );
   };
 
   const getCategory = (habit: THabit) =>

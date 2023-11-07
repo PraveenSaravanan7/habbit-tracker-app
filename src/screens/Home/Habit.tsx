@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
 import getHabitModel, {
   HABIT_MODEL_EVENT,
   THabit,
@@ -75,6 +75,12 @@ export const Habit = () => {
     console.log(habit);
     getHabitModel().update(habit);
     updateHabit();
+
+    ToastAndroid.showWithGravity(
+      'Archived',
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+    );
   };
 
   useEffect(() => {
