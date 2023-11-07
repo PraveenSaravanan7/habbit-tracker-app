@@ -1,17 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import getHabitModel, {
-  HABIT_MODEL_EVENT,
-  THabit,
-} from '../../database/models/habit';
+import getHabitModel, {THabit} from '../../database/models/habit';
 import getCategoryModel, {ICategory} from '../../database/models/category';
 import {convertHexToRGBA, getRepeatText} from '../../utils';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import {CategoryIcon} from '../components/CategoryIcon';
 import {Header} from '../../components/Header';
-import database from '../../database/database';
+import {HABIT_MODEL_EVENT, emitDatabaseEvent} from '../../database/database';
 
 export const Archived = () => {
   const {theme} = useTheme();
@@ -31,7 +28,7 @@ export const Archived = () => {
     habit.archived = false;
     getHabitModel().update(habit);
     updateHabit();
-    database.emit(HABIT_MODEL_EVENT.ADD_HABIT);
+    emitDatabaseEvent(HABIT_MODEL_EVENT.ADD_HABIT);
 
     ToastAndroid.showWithGravity(
       'Unarchived',

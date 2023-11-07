@@ -16,7 +16,6 @@ import {ICategory} from '../../database/models/category';
 import {SelectHabitType} from './SelectHabitType';
 import getHabitModel, {
   COMPARISON_TYPE,
-  HABIT_MODEL_EVENT,
   HABIT_TYPES,
   REPEAT_TYPE,
   THabit,
@@ -25,7 +24,7 @@ import {Description} from './Description';
 import {SelectRepetition} from './SelectRepetition';
 import {SelectStartDate} from './SelectStartDate';
 import moment from 'moment';
-import database from '../../database/database';
+import {HABIT_MODEL_EVENT, emitDatabaseEvent} from '../../database/database';
 import {v4 as uuid} from 'uuid';
 
 enum SCREENS {
@@ -121,7 +120,7 @@ export const Add = () => {
 
     console.log('-- Added habit ', habit);
 
-    database.emit(HABIT_MODEL_EVENT.ADD_HABIT); // TODO: Maybe add data arg as well
+    emitDatabaseEvent(HABIT_MODEL_EVENT.ADD_HABIT); // TODO: Maybe add data arg as well
 
     goBack();
   };

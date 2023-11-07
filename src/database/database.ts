@@ -17,4 +17,20 @@ const database = new loki('db.json', {
   },
 });
 
+export enum HABIT_MODEL_EVENT {
+  ADD_HABIT = 'add_habit',
+}
+
+export enum HISTORY_MODEL_EVENT {
+  UPDATE_HISTORY = 'update_history',
+}
+
+export const emitDatabaseEvent = (
+  event: HABIT_MODEL_EVENT | HISTORY_MODEL_EVENT,
+) => {
+  try {
+    database.emit(event);
+  } catch (e) {}
+};
+
 export default database;

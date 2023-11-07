@@ -1,11 +1,11 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
-import getHabitModel, {
-  HABIT_MODEL_EVENT,
-  THabit,
-} from '../../database/models/habit';
+import getHabitModel, {THabit} from '../../database/models/habit';
 import {TextContent} from '../../components/TextContent';
-import database from '../../database/database';
+import database, {
+  HABIT_MODEL_EVENT,
+  HISTORY_MODEL_EVENT,
+} from '../../database/database';
 import {useTheme} from '../../../ThemeProvider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import getCategoryModel, {ICategory} from '../../database/models/category';
@@ -32,7 +32,7 @@ export const Habit = () => {
   const [activeHabit, setActiveHabit] = useState<THabit>();
 
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+  const {UpdateUi, updateProgress} = useHabitUpdate();
 
   const getCategory = (habit: THabit) =>
     categories.find(category => category.id === habit.category);
@@ -46,8 +46,8 @@ export const Habit = () => {
     return list;
   }, []);
 
-  const fetchHistory = useCallback(
-    (): IHistory[] =>
+  const updateHistory = () =>
+    setHistory(() =>
       JSON.parse(
         JSON.stringify(
           getHistoryModel().find({
@@ -55,8 +55,7 @@ export const Habit = () => {
           }),
         ),
       ),
-    [days],
-  );
+    );
 
   const updateHabit = () =>
     setHabits(() =>
@@ -72,7 +71,7 @@ export const Habit = () => {
 
   const archive = (habit: THabit) => {
     habit.archived = true;
-    console.log(habit);
+
     getHabitModel().update(habit);
     updateHabit();
 
@@ -93,13 +92,20 @@ export const Habit = () => {
   useEffect(() => {
     updateHabit();
     setCategories(getCategoryModel().find());
-    setHistory(() => fetchHistory());
+    updateHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setHistory(() => fetchHistory());
-  }, [historyUpdated, fetchHistory]);
+    database.addListener(HISTORY_MODEL_EVENT.UPDATE_HISTORY, updateHistory);
+
+    return () =>
+      database.removeListener(
+        HISTORY_MODEL_EVENT.UPDATE_HISTORY,
+        updateHistory,
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

@@ -5,6 +5,7 @@ import getHistoryModel, {IHistory} from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
+import {HISTORY_MODEL_EVENT, emitDatabaseEvent} from '../database/database';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -122,6 +123,8 @@ export const useHabitUpdate = () => {
       setOpenModal(false);
       setActiveDate('');
       setActiveHabit(undefined);
+
+      emitDatabaseEvent(HISTORY_MODEL_EVENT.UPDATE_HISTORY);
     },
     [activeHabit, getHistoryRecord],
   );
