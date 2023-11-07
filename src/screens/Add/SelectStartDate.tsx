@@ -6,8 +6,7 @@ import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import moment from 'moment';
 import {CalendarModal} from '../components/CalendarModal';
-import {Modal} from '../../components/Modal';
-import {TextInput} from '../../components/TextInput';
+import {NumberInputModal} from '../components/NumberInputModal';
 
 interface ISelectStartDateProps {
   startDate: string;
@@ -157,84 +156,16 @@ export const SelectStartDate = ({
       )}
 
       {openPriorityModel && (
-        <EditPriority
+        <NumberInputModal
           isOpen={openPriorityModel}
-          name={priority}
-          updateName={val => Number.isInteger(val) && updatePriority(val)}
+          title="Set a priority"
+          updateNumber={val => updatePriority(val)}
           updateVisibility={visibility => setOpenPriorityModel(visibility)}
+          defaultValue={+priority}
+          description="Higher priority activities will be displayed higher in the list"
         />
       )}
     </View>
-  );
-};
-
-interface IEditPriorityProps {
-  isOpen: boolean;
-  updateVisibility: (visibility: boolean) => void;
-  updateName: (name: number) => void;
-  name: number;
-}
-
-const EditPriority = ({
-  isOpen,
-  updateVisibility,
-  updateName,
-  name,
-}: IEditPriorityProps) => {
-  const {theme} = useTheme();
-
-  const [listName, setListName] = useState(name);
-
-  const onClose = () => updateVisibility(false);
-
-  const onOk = () => {
-    updateName(listName);
-    onClose();
-  };
-
-  return (
-    <Modal width={'80%'} isVisible={isOpen} updateVisibility={updateVisibility}>
-      <View
-        style={[
-          styles.containerEdit,
-          {backgroundColor: theme.colors.surface[100]},
-        ]}>
-        <View style={[styles.nameTextInputContainer]}>
-          <View>
-            <TextInput
-              label="Priority"
-              autoFocus={true}
-              onChangeText={text => setListName(+text)}
-              value={name.toString()}
-              labelBackgroundColor={theme.colors.surface[100]}
-              keyboardType="number-pad"
-            />
-          </View>
-        </View>
-        <View
-          style={[
-            styles.actionsContainer,
-            {borderTopColor: theme.colors.surface[200]},
-          ]}>
-          <Pressable
-            onPress={onClose}
-            style={[
-              styles.actionButton,
-              {backgroundColor: theme.colors.surface[100]},
-            ]}>
-            <TextContent style={[styles.actionButtonText]}>CANCEL</TextContent>
-          </Pressable>
-          <Pressable
-            onPress={onOk}
-            style={[
-              styles.actionButton,
-              {backgroundColor: theme.colors.surface[100]},
-            ]}>
-            <TextContent style={[styles.actionButtonText]}>OK</TextContent>
-          </Pressable>
-        </View>
-      </View>
-    </Modal>
   );
 };
 

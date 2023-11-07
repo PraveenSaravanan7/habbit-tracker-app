@@ -12,6 +12,7 @@ interface INumberInputModalProps {
   title: string;
   defaultValue?: number;
   targetValue?: number;
+  description?: string;
 }
 
 export const NumberInputModal = ({
@@ -21,6 +22,7 @@ export const NumberInputModal = ({
   title,
   defaultValue = 0,
   targetValue,
+  description,
 }: INumberInputModalProps) => {
   const {theme} = useTheme();
 
@@ -81,6 +83,12 @@ export const NumberInputModal = ({
               <MaterialCommunityIcons name="plus" color="#fff" size={22} />
             </Pressable>
           </View>
+          {Boolean(description) && (
+            <TextContent
+              style={[styles.targetInput, {color: theme.colors.disabledText}]}>
+              {description}
+            </TextContent>
+          )}
           {targetValue !== undefined && (
             <TextContent
               style={[styles.targetInput, {color: theme.colors.disabledText}]}>
@@ -114,6 +122,7 @@ export const NumberInputModal = ({
 const styles = StyleSheet.create({
   targetInput: {
     fontSize: 12,
+    textAlign: 'center',
   },
   incButtonText: {
     fontSize: 22,

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -75,6 +75,8 @@ export const Add = () => {
   const [priority, setPriority] = useState(1);
   const [discardModal, setDiscardModal] = useState<any>();
 
+  const skipDiscardModel = useRef<boolean>();
+
   const updateName = (name: string) => setNameTextInput(name);
   const updateDescription = (val: string) => setDescription(val);
   const updateGoal = (val: number) => setGoal(val);
@@ -128,6 +130,8 @@ export const Add = () => {
     console.log('-- Added habit ', habit);
 
     emitDatabaseEvent(HABIT_MODEL_EVENT.ADD_HABIT); // TODO: Maybe add data arg as well
+
+    skipDiscardModel.current = true;
 
     goBack();
   };
@@ -232,11 +236,13 @@ export const Add = () => {
 
   useEffect(() => {
     addNavigationListener('beforeRemove', e => {
+      if (skipDiscardModel.current) return;
+
       e.preventDefault();
 
       setDiscardModal(e);
     });
-  }, [addNavigationListener]);
+  }, [addNavigationListener, skipDiscardModel]);
 
   return (
     <>
