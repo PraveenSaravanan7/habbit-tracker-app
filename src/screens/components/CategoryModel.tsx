@@ -1,39 +1,30 @@
-import React, {useState} from 'react';
-import {useTheme} from '../../../ThemeProvider';
+import React from 'react';
 import {Modal} from '../../components/Modal';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {TextContent} from '../../components/TextContent';
-import {TextInput} from '../../components/TextInput';
+import {useTheme} from '../../../ThemeProvider';
+import getCategoryModel, {ICategory} from '../../database/models/category';
+import {CategoryIcon} from './CategoryIcon';
 
-interface ITextInputModalProps {
+interface ICategoryModelProps {
   isOpen: boolean;
   updateVisibility: (visibility: boolean) => void;
-  updateText: (val: string) => void;
+  updateCategory: (val: ICategory) => void;
   title?: string;
-  label: string;
-  defaultValue?: string;
-  targetValue?: string;
-  description?: string;
 }
 
-export const TextInputModal = ({
+export const CategoryModel = ({
   isOpen,
   title,
-  label,
-  updateText,
+  updateCategory,
   updateVisibility,
-  defaultValue,
-  description,
-  targetValue,
-}: ITextInputModalProps) => {
+}: ICategoryModelProps) => {
   const {theme} = useTheme();
-
-  const [value, setValue] = useState(defaultValue);
 
   const onClose = () => updateVisibility(false);
 
-  const onOk = () => {
-    updateText(value || '');
+  const onOk = (category: ICategory) => {
+    updateCategory(category);
     onClose();
   };
 
@@ -52,29 +43,31 @@ export const TextInputModal = ({
             <TextContent style={[styles.titleText]}>{title}</TextContent>
           </View>
         )}
-        <View style={[styles.nameTextInputContainer]}>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              label={label}
-              autoFocus={true}
-              onChangeText={text => setValue(text)}
-              value={value}
-              labelBackgroundColor={theme.colors.surface[100]}
-            />
-          </View>
-          {Boolean(description) && (
-            <TextContent
-              style={[styles.targetInput, {color: theme.colors.disabledText}]}>
-              {description}
-            </TextContent>
-          )}
-          {targetValue !== undefined && (
-            <TextContent
-              style={[styles.targetInput, {color: theme.colors.disabledText}]}>
-              Progress: {value}/{targetValue}
-            </TextContent>
-          )}
-        </View>
+        <ScrollView
+          keyboardShouldPersistTaps={'handled'}
+          contentContainerStyle={[styles.scrollContainer]}>
+          {getCategoryModel()
+            .find()
+            .map(category => (
+              <Pressable
+                style={styles.iconContainer}
+                onPress={() => onOk(category)}>
+                <CategoryIcon
+                  borderRadius={16}
+                  category={category}
+                  iconSize={28}
+                  size={48}
+                />
+                <TextContent
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  fontSize={12}
+                  maxScreenWidth={0.15}>
+                  {category.name}
+                </TextContent>
+              </Pressable>
+            ))}
+        </ScrollView>
         <View style={[styles.actionsContainer, {borderTopColor: borderColor}]}>
           <Pressable
             onPress={onClose}
@@ -82,15 +75,7 @@ export const TextInputModal = ({
               styles.actionButton,
               {backgroundColor: theme.colors.surface[100]},
             ]}>
-            <TextContent style={[styles.actionButtonText]}>CANCEL</TextContent>
-          </Pressable>
-          <Pressable
-            onPress={onOk}
-            style={[
-              styles.actionButton,
-              {backgroundColor: theme.colors.surface[100]},
-            ]}>
-            <TextContent style={[styles.actionButtonText]}>OK</TextContent>
+            <TextContent style={[styles.actionButtonText]}>CLOSE</TextContent>
           </Pressable>
         </View>
       </View>
@@ -136,5 +121,18 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 8,
+    paddingVertical: 16,
+    columnGap: 20,
+    rowGap: 20,
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    alignItems: 'center',
+    rowGap: 4,
   },
 });

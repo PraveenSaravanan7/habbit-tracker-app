@@ -15,6 +15,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {TextInputModal} from '../components/TextInputModal';
 import {HABIT_MODEL_EVENT, emitDatabaseEvent} from '../../database/database';
 import {NumberInputModal} from '../components/NumberInputModal';
+import getCategoryModel, {ICategory} from '../../database/models/category';
+import {CategoryModel} from '../components/CategoryModel';
 
 export enum HABIT_INFO_TAB {
   CALENDAR = 'Calendar',
@@ -24,11 +26,12 @@ export enum HABIT_INFO_TAB {
 
 export const HabitInfo = () => {
   const {
-    params: {habit: habitParam, category, tab},
+    params: {habit: habitParam, category: categoryParam, tab},
   } = useRouter<'HabitInfo'>();
 
   const [habit, setHabit] = useState(habitParam);
   const [activeTab, setActiveTab] = useState(tab);
+  const [category, setCategory] = useState<ICategory>(categoryParam);
   // TODO: fetch only history of the month
   const [history, setHistory] = useState<IHistory[]>(() =>
     JSON.parse(JSON.stringify(getHistoryModel().find())),
@@ -43,7 +46,10 @@ export const HabitInfo = () => {
     [],
   );
 
-  const updateHabit = (updatedHabit: THabit) => setHabit({...updatedHabit});
+  const updateHabit = (updatedHabit: THabit, updatedCategory?: ICategory) => {
+    setHabit({...updatedHabit});
+    if (updatedCategory) setCategory({...updatedCategory});
+  };
 
   return (
     <View>
@@ -123,17 +129,21 @@ const EditHabit = ({
   updateHabit,
 }: {
   habit: THabit;
-  updateHabit: (habit: THabit) => void;
+  updateHabit: (habit: THabit, category?: ICategory) => void;
 }) => {
   const {theme} = useTheme();
 
   const [editItemType, setEditItemType] = useState<
-    'NAME' | 'DESCRIPTION' | 'PRIORITY'
+    'NAME' | 'DESCRIPTION' | 'PRIORITY' | 'CATEGORY'
   >();
 
-  const saveUpdatedHabit = (updatedHabit: THabit) => {
+  const category = getCategoryModel().findOne({
+    id: habit.category,
+  }) as ICategory;
+
+  const saveUpdatedHabit = (updatedHabit: THabit, category?: ICategory) => {
     getHabitModel().update(updatedHabit);
-    updateHabit(updatedHabit);
+    updateHabit(updatedHabit, category);
     emitDatabaseEvent(HABIT_MODEL_EVENT.UPDATE_HABIT);
   };
 
@@ -187,6 +197,32 @@ const EditHabit = ({
             color={theme.colors.disabledText}>
             {habit.habitName}
           </TextContent>
+        }
+      />
+      <Item
+        borderTop={1}
+        iconName="view-grid-outline"
+        name="Category"
+        onPress={() => setEditItemType('CATEGORY')}
+        rightIcon={
+          <View style={styles.categoryContainer}>
+            <TextContent
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              maxScreenWidth={0.3}
+              fontFamily="Inter-Medium"
+              fontSize={14}
+              color={category.color}>
+              {category?.name}
+            </TextContent>
+
+            <CategoryIcon
+              borderRadius={8}
+              category={category}
+              iconSize={18}
+              size={28}
+            />
+          </View>
         }
       />
       <Item
@@ -256,6 +292,20 @@ const EditHabit = ({
           defaultValue={habit.priority}
         />
       )}
+
+      {editItemType === 'CATEGORY' && (
+        <CategoryModel
+          isOpen={true}
+          title="Select category"
+          updateCategory={selected => {
+            habit.category = selected.id;
+            saveUpdatedHabit(habit, selected);
+          }}
+          updateVisibility={visibility => {
+            if (!visibility) setEditItemType(undefined);
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -276,5 +326,9 @@ const styles = StyleSheet.create({
   },
   menuRightIcon: {
     marginLeft: 'auto',
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    columnGap: 8,
   },
 });
