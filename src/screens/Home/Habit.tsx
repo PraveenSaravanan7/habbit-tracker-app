@@ -84,9 +84,12 @@ export const Habit = () => {
 
   useEffect(() => {
     database.addListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
+    database.addListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
 
-    return () =>
+    return () => {
       database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
+      database.removeListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
+    };
   }, []);
 
   useEffect(() => {
