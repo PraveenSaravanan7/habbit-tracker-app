@@ -66,7 +66,16 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
     setHabits(
       [...allHabits]
         .filter(habit => !isDayDisabled(currentDate, habit, true))
-        .sort((a, b) => b.priority - a.priority),
+        .sort((a, b) => {
+          const aHistory = completion.get(a.id);
+          const bHistory = completion.get(b.id);
+
+          if (!aHistory && bHistory) return -1; // a comes before b
+
+          if (aHistory && !bHistory) return 1; // b comes before a
+
+          return b.priority - a.priority;
+        }),
     );
 
     setHistory(completion);
