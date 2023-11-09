@@ -107,3 +107,21 @@ export const getRepeatText = ({repeatConfig}: THabit) => {
   if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
     return repeatConfig.days.join(', ');
 };
+
+export const addTimes = (a: string, b: string): string =>
+  formatTime(getSeconds(a) + getSeconds(b));
+
+export const getSeconds = (time: string) => {
+  const [hours, minutes, seconds] = time.split(':');
+
+  return +hours * 60 * 60 + +minutes * 60 + +seconds;
+};
+
+export const formatTime = (time: number) => {
+  const pad = (val: number) => String(val).padStart(2, '0');
+  const hours = pad(Math.floor(time / 3600));
+  const minutes = pad(Math.floor((time % 3600) / 60));
+  const seconds = pad(Math.floor(time % 60));
+
+  return `${hours}:${minutes}:${seconds}`;
+};

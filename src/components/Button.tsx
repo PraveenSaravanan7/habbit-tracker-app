@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {DimensionValue, Pressable, StyleSheet} from 'react-native';
 import {useTheme} from '../../ThemeProvider';
 import {TextContent} from './TextContent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,6 +10,7 @@ interface IButtonProps {
   backgroundColor?: string;
   textColor?: string;
   icon?: string;
+  width?: DimensionValue;
 }
 
 export const Button = ({
@@ -18,6 +19,7 @@ export const Button = ({
   backgroundColor,
   textColor,
   icon,
+  width,
 }: IButtonProps) => {
   const {theme} = useTheme();
 
@@ -26,7 +28,7 @@ export const Button = ({
       onPress={onPress}
       style={[
         styles.button,
-        {backgroundColor: backgroundColor || theme.colors.surface[100]},
+        {backgroundColor: backgroundColor || theme.colors.surface[100], width},
       ]}>
       {icon && (
         <MaterialCommunityIcons

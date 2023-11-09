@@ -6,6 +6,8 @@ import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
 import {HISTORY_MODEL_EVENT, emitDatabaseEvent} from '../database/database';
+import {addTimes, getSeconds} from '../utils';
+import {ToastAndroid} from 'react-native';
 
 export const useHabitUpdate = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -14,16 +16,37 @@ export const useHabitUpdate = () => {
   const [historyUpdated, setHistoryUpdated] = useState(0);
   const [progress, setProgress] =
     useState<IHistory['habits']['0']['progress']>();
+  const [additionalProgressInTime, setAdditionalProgressInTime] = useState('');
 
   useEffect(() => {
     const historyModel = getHistoryModel();
 
-    setProgress(
-      historyModel
+    setProgress(() => {
+      const currentProgress = historyModel
         .findOne({date: activeDate})
-        ?.habits.find(record => record.habitId === activeHabit?.id)?.progress,
-    );
-  }, [activeDate, activeHabit?.id]);
+        ?.habits.find(record => record.habitId === activeHabit?.id)?.progress;
+
+      if (
+        activeHabit?.habitType === HABIT_TYPES.TIMER &&
+        additionalProgressInTime
+      ) {
+        ToastAndroid.showWithGravity(
+          `Adding ${additionalProgressInTime} with previous progress ${currentProgress}`,
+          ToastAndroid.LONG,
+          ToastAndroid.BOTTOM,
+        );
+
+        return addTimes(currentProgress as string, additionalProgressInTime);
+      }
+
+      return currentProgress;
+    });
+  }, [
+    activeDate,
+    activeHabit?.habitType,
+    activeHabit?.id,
+    additionalProgressInTime,
+  ]);
 
   const getHistoryRecord = useCallback(() => {
     const historyModel = getHistoryModel();
@@ -93,12 +116,6 @@ export const useHabitUpdate = () => {
         typeof habitConfig?.duration === 'string' &&
         typeof progress === 'string'
       ) {
-        const getSeconds = (time: string) => {
-          const [hours, minutes, seconds] = time.split(':');
-
-          return +hours * 60 * 60 + +minutes * 60 + +seconds;
-        };
-
         const progressNumber = getSeconds(progress);
         const targetNumber = getSeconds(habitConfig.duration);
 
@@ -123,24 +140,33 @@ export const useHabitUpdate = () => {
       setOpenModal(false);
       setActiveDate('');
       setActiveHabit(undefined);
+      setAdditionalProgressInTime('');
 
       emitDatabaseEvent(HISTORY_MODEL_EVENT.UPDATE_HISTORY);
     },
     [activeHabit, getHistoryRecord],
   );
 
-  const updateProgress = useCallback((habit: THabit, date: Moment) => {
-    if (date.isAfter(moment().startOf('day'))) return;
+  const updateProgress = useCallback(
+    (habit: THabit, date: Moment, additionalProgressInTime?: string) => {
+      if (date.isAfter(moment().startOf('day'))) return;
 
-    setActiveHabit(habit);
-    setActiveDate(date.format('DD/MM/YYYY'));
+      setActiveHabit(habit);
+      setActiveDate(date.format('DD/MM/YYYY'));
 
-    if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
+      if (habit.habitType === HABIT_TYPES.NUMERIC) setOpenModal(true);
 
-    if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
+      if (habit.habitType === HABIT_TYPES.CHECKLIST) setOpenModal(true);
 
-    if (habit.habitType === HABIT_TYPES.TIMER) setOpenModal(true);
-  }, []);
+      if (habit.habitType === HABIT_TYPES.TIMER) {
+        if (additionalProgressInTime)
+          setAdditionalProgressInTime(additionalProgressInTime);
+
+        setOpenModal(true);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (activeHabit?.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();

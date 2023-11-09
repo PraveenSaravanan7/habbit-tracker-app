@@ -28,7 +28,7 @@ export const Archived = () => {
     habit.archived = false;
     getHabitModel().update(habit);
     updateHabit();
-    emitDatabaseEvent(HABIT_MODEL_EVENT.ADD_HABIT);
+    emitDatabaseEvent(HABIT_MODEL_EVENT.UPDATE_HABIT);
 
     ToastAndroid.showWithGravity(
       'Unarchived',

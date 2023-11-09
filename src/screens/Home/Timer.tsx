@@ -2,30 +2,33 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
-import {convertHexToRGBA} from '../../utils';
+import {convertHexToRGBA, formatTime} from '../../utils';
 import {Button} from '../../components/Button';
 import {commonColors} from '../../../themes';
+import getHabitModel, {HABIT_TYPES} from '../../database/models/habit';
+import {HabitSelectionModel} from '../components/HabitSelectionModel';
+import {useHabitUpdate} from '../../hooks/useHabitUpdate';
+import moment from 'moment';
 
 export const Timer = () => {
   const {theme} = useTheme();
+  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
 
   const [isRunning, setIsRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [habits] = useState(() =>
+    getHabitModel().find({habitType: HABIT_TYPES.TIMER}),
+  );
+  const [openHabitListModel, setOpenHabitListModel] = useState(false);
+
+  const updateModelVisibility = (visibility: boolean) =>
+    setOpenHabitListModel(visibility);
 
   const handleStartTimer = () => setIsRunning(true);
 
   const handleStopTimer = () => setIsRunning(false);
 
   const handleResetTimer = () => setCurrentTime(0);
-
-  const formatTime = (time: number) => {
-    const pad = (val: number) => String(val).padStart(2, '0');
-    const hours = pad(Math.floor(time / 3600));
-    const minutes = pad(Math.floor((time % 3600) / 60));
-    const seconds = pad(Math.floor(time % 60));
-
-    return `${hours}:${minutes}:${seconds}`;
-  };
 
   useEffect(() => {
     if (isRunning) {
@@ -37,44 +40,77 @@ export const Timer = () => {
     }
   }, [isRunning, currentTime]);
 
+  useEffect(() => {
+    handleResetTimer();
+  }, [historyUpdated]);
+
   return (
-    <View style={styles.container}>
-      <View
-        style={[
-          styles.timeCircle,
-          {borderColor: convertHexToRGBA(theme.colors.primary[100], 0.4)},
-        ]}>
-        <TextContent fontSize={38} fontFamily="Inter-Bold">
-          {formatTime(currentTime)}
-        </TextContent>
-      </View>
-      <View style={styles.buttonContainer}>
-        {!isRunning && (
-          <Button
-            title="START"
-            onPress={handleStartTimer}
-            backgroundColor={theme.colors.primary[100]}
-            icon="play"
-          />
-        )}
-        {isRunning && (
-          <Button
-            backgroundColor={commonColors.red}
-            title="STOP"
-            onPress={handleStopTimer}
-            icon="stop"
-          />
-        )}
+    <>
+      <View style={styles.container}>
+        <View
+          style={[
+            styles.timeCircle,
+            {borderColor: convertHexToRGBA(theme.colors.primary[100], 0.4)},
+          ]}>
+          <TextContent fontSize={38} fontFamily="Inter-Bold">
+            {formatTime(currentTime)}
+          </TextContent>
+        </View>
+        <View style={styles.buttonContainer}>
+          {!isRunning && (
+            <Button
+              title={currentTime ? 'RESUME' : 'START'}
+              onPress={handleStartTimer}
+              backgroundColor={theme.colors.primary[100]}
+              icon="play"
+            />
+          )}
+          {isRunning && (
+            <Button
+              backgroundColor={commonColors.red}
+              title="STOP"
+              onPress={handleStopTimer}
+              icon="stop"
+            />
+          )}
+          {!isRunning && !!currentTime && (
+            <Button
+              icon="reload"
+              backgroundColor={theme.colors.surface[200]}
+              title="RESET"
+              onPress={handleResetTimer}
+            />
+          )}
+        </View>
         {!isRunning && !!currentTime && (
-          <Button
-            icon="reload"
-            backgroundColor={theme.colors.surface[200]}
-            title="RESET"
-            onPress={handleResetTimer}
-          />
+          <View style={styles.buttonContainer}>
+            <Button
+              title={'SAVE'}
+              onPress={() => updateModelVisibility(true)}
+              backgroundColor={theme.colors.primary[100]}
+              icon="content-save-check-outline"
+            />
+          </View>
         )}
       </View>
-    </View>
+      {openHabitListModel && (
+        <HabitSelectionModel
+          habits={habits}
+          isOpen={openHabitListModel}
+          updateHabit={habit =>
+            updateProgress(
+              habit,
+              moment().startOf('day'),
+              formatTime(currentTime),
+            )
+          }
+          updateVisibility={updateModelVisibility}
+          title="Select a habit"
+        />
+      )}
+
+      <UpdateUi />
+    </>
   );
 };
 
@@ -84,11 +120,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 50,
+    padding: 20,
+    rowGap: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 40,
     width: 'auto',
     columnGap: 20,
   },
@@ -99,5 +136,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 12,
     borderRadius: 1000,
+    marginBottom: 20,
   },
 });
