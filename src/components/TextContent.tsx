@@ -30,8 +30,8 @@ export const TextContent = ({
       {...restProps}
       style={[
         styles.text,
-        {color: theme.colors.text},
-        {maxWidth, fontFamily, fontSize, color},
+        {color: color || theme.colors.text},
+        {maxWidth, fontFamily, fontSize},
         style,
       ]}>
       {children}
