@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTheme} from '../../../ThemeProvider';
@@ -6,6 +6,7 @@ import {MAIN_TABS} from './types';
 import {TextContent} from '../../components/TextContent';
 import {useNavigator} from '../../../NavigationUtils';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Modal} from '../../components/Modal';
 
 interface IFooterProps {
   activeTab: MAIN_TABS;
@@ -39,6 +40,8 @@ export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
   const {theme} = useTheme();
   const {navigate} = useNavigator();
   const insets = useSafeAreaInsets();
+
+  const [isModelOpen, setIsModelOpen] = useState(false);
 
   return (
     <>
@@ -81,7 +84,9 @@ export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
       </View>
 
       <View style={[styles.addButtonContainer, {bottom: 98 + insets.bottom}]}>
-        <Pressable style={styles.addButton} onPress={() => navigate('Add')}>
+        <Pressable
+          style={styles.addButton}
+          onPress={() => setIsModelOpen(true)}>
           <MaterialCommunityIcons
             name="plus"
             size={28}
@@ -89,7 +94,107 @@ export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
           />
         </Pressable>
       </View>
+
+      <AddHabitModel
+        onPress={() => navigate('Add')}
+        isOpen={isModelOpen}
+        updateVisibility={(isOpen: boolean) => setIsModelOpen(isOpen)}
+      />
     </>
+  );
+};
+
+interface IAddHabitModelProps {
+  isOpen: boolean;
+  updateVisibility: (visibility: boolean) => void;
+  onPress: (isTask: boolean) => void;
+}
+
+export const AddHabitModel = ({
+  isOpen,
+  onPress,
+  updateVisibility,
+}: IAddHabitModelProps) => {
+  const {theme} = useTheme();
+
+  const handleSelect = (isTask: boolean) => {
+    onPress(isTask);
+    updateVisibility(false);
+  };
+
+  // eslint-disable-next-line react/no-unstable-nested-components
+  const Item = ({
+    onSelect,
+    borderBottomWidth,
+    icon,
+    name,
+    description,
+  }: {
+    onSelect: () => void;
+    borderBottomWidth: number;
+    icon: string;
+    name: string;
+    description: string;
+  }) => (
+    <Pressable
+      onPress={onSelect}
+      style={[
+        styles.menuItem,
+        {
+          borderBottomColor: theme.colors.surface[200],
+          borderBottomWidth,
+        },
+      ]}>
+      <MaterialCommunityIcons
+        name={icon}
+        size={26}
+        color={theme.colors.primary[100]}
+      />
+      <View style={styles.itemTextContainer}>
+        <TextContent fontSize={18} fontFamily="Inter-Bold">
+          {name}
+        </TextContent>
+        <TextContent fontSize={12} color={theme.colors.disabledText}>
+          {description}
+        </TextContent>
+      </View>
+
+      <View style={styles.itemRightIconContainer}>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={26}
+          color={theme.colors.disabledText}
+        />
+      </View>
+    </Pressable>
+  );
+
+  return (
+    <Modal
+      placeContentAtBottom
+      isVisible={isOpen}
+      updateVisibility={updateVisibility}>
+      <View
+        style={[
+          styles.modalContainer,
+          {backgroundColor: theme.colors.surface[100]},
+        ]}>
+        <Item
+          onSelect={() => handleSelect(false)}
+          borderBottomWidth={1}
+          description="A recurrent, automatic behavior acquired through frequent repetition."
+          icon="reload"
+          name="Habit"
+        />
+        <Item
+          onSelect={() => handleSelect(false)}
+          borderBottomWidth={0}
+          description="A specific, goal-oriented activity or assignment requiring effort and completion."
+          icon="checkbox-marked-circle-outline"
+          name="Task"
+        />
+      </View>
+    </Modal>
   );
 };
 
@@ -140,5 +245,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 16,
     backgroundColor: 'rgba(0,0,0,0)',
+  },
+  menuItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    columnGap: 20,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+  },
+  menuItemText: {
+    fontSize: 14,
+  },
+  modalContainer: {
+    flexDirection: 'column',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  itemTextContainer: {
+    width: '80%',
+    rowGap: 4,
+  },
+  itemRightIconContainer: {
+    marginLeft: 'auto',
   },
 });
