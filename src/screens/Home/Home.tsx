@@ -37,7 +37,8 @@ export const Home = () => {
             />
           )}
           {activeTab === MAIN_TABS.CATEGORY && <Category />}
-          {activeTab === MAIN_TABS.HABIT && <Habit />}
+          {activeTab === MAIN_TABS.HABIT && <Habit tasksMode={false} />}
+          {activeTab === MAIN_TABS.TASK && <Habit tasksMode={true} />}
           {activeTab === MAIN_TABS.TIMER && <Timer />}
         </View>
       </ScrollView>

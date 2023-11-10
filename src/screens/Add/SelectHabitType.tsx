@@ -7,13 +7,19 @@ import {TextContent} from '../../components/TextContent';
 
 interface ISelectHabitType {
   onSelectHabitType: (habitType: HABIT_TYPES) => void;
+  isTask: boolean;
 }
 
-export const SelectHabitType = ({onSelectHabitType}: ISelectHabitType) => {
+export const SelectHabitType = ({
+  onSelectHabitType,
+  isTask,
+}: ISelectHabitType) => {
   const {theme} = useTheme();
 
   const backgroundColor = theme.colors.primary[100];
   const color = theme.colors.disabledText;
+
+  const activity = isTask ? 'task' : 'habit';
 
   return (
     <View style={[styles.wrapper]}>
@@ -43,7 +49,7 @@ export const SelectHabitType = ({onSelectHabitType}: ISelectHabitType) => {
           </Pressable>
           <TextContent style={[styles.description, {color}]}>
             If you just want to establish a value as a daily goal or limit for
-            the habit
+            the {activity}
           </TextContent>
         </View>
 
@@ -55,7 +61,7 @@ export const SelectHabitType = ({onSelectHabitType}: ISelectHabitType) => {
           </Pressable>
           <TextContent style={[styles.description, {color}]}>
             If you just want to establish a time value as a daily goal or limit
-            for the habit
+            for the {activity}
           </TextContent>
         </View>
 

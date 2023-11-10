@@ -96,7 +96,7 @@ export const Footer = ({activeTab, updateActiveTab}: IFooterProps) => {
       </View>
 
       <AddHabitModel
-        onPress={() => navigate('Add')}
+        onPress={isTask => navigate('Add', {isTask})}
         isOpen={isModelOpen}
         updateVisibility={(isOpen: boolean) => setIsModelOpen(isOpen)}
       />
@@ -187,7 +187,7 @@ export const AddHabitModel = ({
           name="Habit"
         />
         <Item
-          onSelect={() => handleSelect(false)}
+          onSelect={() => handleSelect(true)}
           borderBottomWidth={0}
           description="A specific, goal-oriented activity or assignment requiring effort and completion."
           icon="checkbox-marked-circle-outline"
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   },
   itemTextContainer: {
     width: '80%',
-    rowGap: 4,
+    rowGap: 2,
   },
   itemRightIconContainer: {
     marginLeft: 'auto',

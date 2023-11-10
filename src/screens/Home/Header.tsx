@@ -71,7 +71,7 @@ export const Header = ({
               />
             </Pressable>
           )}
-          {activeTab === MAIN_TABS.HABIT && (
+          {(activeTab === MAIN_TABS.HABIT || activeTab === MAIN_TABS.TASK) && (
             <Pressable onPress={() => navigate('Archived')}>
               <MaterialCommunityIcons
                 name="archive-arrow-down-outline"

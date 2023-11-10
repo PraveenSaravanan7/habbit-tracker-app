@@ -20,6 +20,7 @@ export enum REPEAT_TYPE {
   DAY_OF_THE_MONTH,
   DAY_OF_THE_WEEK,
   DAY_OF_THE_YEAR,
+  NO_REPEAT,
 }
 
 export enum DAY_OF_THE_WEEK {
@@ -101,6 +102,7 @@ interface IHabitBase<
   habitName: string;
   habitDescription: string;
   repeatConfig:
+    | IRepeatConfig<REPEAT_TYPE.NO_REPEAT, undefined>
     | IRepeatConfig<REPEAT_TYPE.EVERY_DAY, undefined>
     | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_WEEK, DAY_OF_THE_WEEK[]>
     | IRepeatConfig<REPEAT_TYPE.DAY_OF_THE_MONTH, DAY_OF_THE_MONTH[]>

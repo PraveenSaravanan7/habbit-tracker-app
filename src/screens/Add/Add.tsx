@@ -10,7 +10,7 @@ import {
 import {TextContent} from '../../components/TextContent';
 import {useTheme} from '../../../ThemeProvider';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigator} from '../../../NavigationUtils';
+import {useNavigator, useRouter} from '../../../NavigationUtils';
 import {SelectCategory} from './SelectCategory';
 import {ICategory} from '../../database/models/category';
 import {SelectHabitType} from './SelectHabitType';
@@ -44,6 +44,10 @@ export const Add = () => {
     dispatch: dispatchNavigation,
     goBack,
   } = useNavigator();
+  const {
+    params: {isTask},
+  } = useRouter<'Add'>();
+
   const insets = useSafeAreaInsets();
 
   const backgroundColor = theme.colors.surface[100];
@@ -65,7 +69,7 @@ export const Add = () => {
     COMPARISON_TYPE.AT_LEAST,
   );
   const [repeatConfig, setRepeatConfig] = useState<THabit['repeatConfig']>({
-    repeatType: REPEAT_TYPE.EVERY_DAY,
+    repeatType: isTask ? REPEAT_TYPE.NO_REPEAT : REPEAT_TYPE.EVERY_DAY,
     days: undefined,
   });
   const [startDate, setStartDate] = useState(
@@ -111,7 +115,9 @@ export const Add = () => {
       category: category?.id || '',
       startDate,
       priority,
-      endDate,
+      endDate:
+        repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT ? startDate : endDate,
+      isTask,
     };
 
     if (habit.habitType === HABIT_TYPES.NUMERIC)
@@ -178,7 +184,8 @@ export const Add = () => {
   const isInValidateStep = () => {
     switch (activeScreen) {
       case SCREENS.DEFINE:
-        if (!nameTextInput) return 'Please enter valid habit';
+        if (!nameTextInput)
+          return `Please enter valid ${isTask ? 'task' : 'habit'}`;
         if (habitType === HABIT_TYPES.NUMERIC && !goal)
           return 'Please enter valid goal';
         if (habitType === HABIT_TYPES.TIMER && goalTime === defaultGoalTime)
@@ -189,6 +196,7 @@ export const Add = () => {
 
       case SCREENS.SELECT_REPEAT_CONFIG:
         if (
+          repeatConfig.repeatType !== REPEAT_TYPE.NO_REPEAT &&
           repeatConfig.repeatType !== REPEAT_TYPE.EVERY_DAY &&
           repeatConfig.days.length === 0
         )
@@ -250,13 +258,17 @@ export const Add = () => {
         keyboardShouldPersistTaps={'handled'}
         style={[styles.container]}>
         {activeScreen === SCREENS.SELECT_CATEGORY && (
-          <SelectCategory onSelectCategory={onSelectCategory} />
+          <SelectCategory onSelectCategory={onSelectCategory} isTask={isTask} />
         )}
         {activeScreen === SCREENS.SELECT_HABIT_TYPE && (
-          <SelectHabitType onSelectHabitType={onSelectHabitType} />
+          <SelectHabitType
+            onSelectHabitType={onSelectHabitType}
+            isTask={isTask}
+          />
         )}
         {activeScreen === SCREENS.DEFINE && (
           <Description
+            isTask={isTask}
             habitType={habitType}
             name={nameTextInput}
             updateName={updateName}
@@ -276,12 +288,14 @@ export const Add = () => {
         )}
         {activeScreen === SCREENS.SELECT_REPEAT_CONFIG && (
           <SelectRepetition
+            isTask={isTask}
             repeatConfig={repeatConfig}
             updateRepeatConfig={updateRepeatConfig}
           />
         )}
         {activeScreen === SCREENS.SELECT_START_DATE && (
           <SelectStartDate
+            noRepeat={repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT}
             startDate={startDate}
             endDate={endDate}
             priority={priority}
@@ -340,7 +354,7 @@ export const Add = () => {
         )}
       </View>
       <ConfirmationModal
-        text="Discard the new Habit?"
+        text={`Discard the new ${isTask ? 'task' : 'habit'}?`}
         color={commonColors.red}
         isOpen={Boolean(discardModal)}
         onCancel={() => setDiscardModal(undefined)}

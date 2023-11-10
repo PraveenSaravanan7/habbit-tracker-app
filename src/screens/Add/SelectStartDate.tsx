@@ -15,12 +15,14 @@ interface ISelectStartDateProps {
   updateStartDate: (date: string) => void;
   updateEndDate: (date: string) => void;
   updatePriority: (val: number) => void;
+  noRepeat: boolean;
 }
 
 export const SelectStartDate = ({
   startDate,
   endDate,
   priority,
+  noRepeat,
   updateEndDate,
   updatePriority,
   updateStartDate,
@@ -52,7 +54,9 @@ export const SelectStartDate = ({
               color={iconColor}
               size={28}
             />
-            <TextContent style={[styles.itemText]}>Start Date</TextContent>
+            <TextContent style={[styles.itemText]}>
+              {noRepeat ? 'Date' : 'Start Date'}
+            </TextContent>
           </View>
           <View style={[styles.button, {backgroundColor: buttonBackground}]}>
             <TextContent style={[styles.buttonText]}>
@@ -63,38 +67,41 @@ export const SelectStartDate = ({
           </View>
         </Pressable>
 
-        <Pressable
-          style={[styles.item, {borderBottomColor}]}
-          onPress={() => setOpenEndDateModel(true)}>
-          <View style={[styles.iconContainer]}>
-            <MaterialCommunityIcons
-              name="calendar"
-              color={iconColor}
-              size={28}
-            />
-            <TextContent style={[styles.itemText]}>End Date</TextContent>
-          </View>
-
-          <View style={[styles.endDateContainer]}>
-            <View style={[styles.button, {backgroundColor: buttonBackground}]}>
-              <TextContent style={[styles.buttonText]}>
-                {!endDate ? 'None' : endDate}
-              </TextContent>
+        {!noRepeat && (
+          <Pressable
+            style={[styles.item, {borderBottomColor}]}
+            onPress={() => setOpenEndDateModel(true)}>
+            <View style={[styles.iconContainer]}>
+              <MaterialCommunityIcons
+                name="calendar"
+                color={iconColor}
+                size={28}
+              />
+              <TextContent style={[styles.itemText]}>End Date</TextContent>
             </View>
 
-            {Boolean(endDate) && (
-              <Pressable
-                style={[styles.button, {backgroundColor: buttonBackground}]}
-                onPress={() => updateEndDate('')}>
-                <MaterialCommunityIcons
-                  name="close"
-                  color={theme.colors.text}
-                  size={18}
-                />
-              </Pressable>
-            )}
-          </View>
-        </Pressable>
+            <View style={[styles.endDateContainer]}>
+              <View
+                style={[styles.button, {backgroundColor: buttonBackground}]}>
+                <TextContent style={[styles.buttonText]}>
+                  {!endDate ? 'None' : endDate}
+                </TextContent>
+              </View>
+
+              {Boolean(endDate) && (
+                <Pressable
+                  style={[styles.button, {backgroundColor: buttonBackground}]}
+                  onPress={() => updateEndDate('')}>
+                  <MaterialCommunityIcons
+                    name="close"
+                    color={theme.colors.text}
+                    size={18}
+                  />
+                </Pressable>
+              )}
+            </View>
+          </Pressable>
+        )}
 
         <Pressable
           style={[styles.item]}

@@ -26,9 +26,12 @@ export const isDayDisabled = (
   ignoreFutureCheck = false,
 ) => {
   const startDate = moment(habit.startDate, 'DD/MM/YYYY');
+  const endDate = moment(habit.endDate, 'DD/MM/YYYY');
   const {repeatConfig} = habit;
 
   if (day.isBefore(startDate)) return true;
+
+  if (day.isAfter(endDate)) return true;
 
   if (!ignoreFutureCheck && day.isAfter(moment().endOf('day'))) return true;
 
@@ -96,6 +99,8 @@ export const getDayColorAndIsDisabled = (
 };
 
 export const getRepeatText = ({repeatConfig}: THabit) => {
+  if (repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT) return 'Not repeated';
+
   if (repeatConfig.repeatType === REPEAT_TYPE.EVERY_DAY) return 'Every day';
 
   if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK)
@@ -106,6 +111,8 @@ export const getRepeatText = ({repeatConfig}: THabit) => {
 
   if (repeatConfig.repeatType === REPEAT_TYPE.DAY_OF_THE_YEAR)
     return repeatConfig.days.join(', ');
+
+  return '';
 };
 
 export const addTimes = (a: string, b: string): string =>

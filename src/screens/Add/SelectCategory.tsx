@@ -8,9 +8,10 @@ import {CategoryIcon} from '../components/CategoryIcon';
 
 interface ISelectCategory {
   onSelectCategory: (category: ICategory) => void;
+  isTask: boolean;
 }
 
-export const SelectCategory = ({onSelectCategory}: ISelectCategory) => {
+export const SelectCategory = ({onSelectCategory, isTask}: ISelectCategory) => {
   const {theme} = useTheme();
   const categoryModel = getCategoryModel();
 
@@ -26,7 +27,9 @@ export const SelectCategory = ({onSelectCategory}: ISelectCategory) => {
 
   return (
     <View style={[styles.wrapper]}>
-      <Title title="Select a category for your habit" />
+      <Title
+        title={`Select a category for your ${isTask ? 'task' : 'habit'}`}
+      />
       <View style={[styles.container]}>
         {categories.map(category => (
           <Pressable

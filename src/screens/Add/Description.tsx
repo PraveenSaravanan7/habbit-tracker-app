@@ -30,6 +30,7 @@ interface IDescriptionProps {
   updateGoalTime: (val: string) => void;
   checkList: string[];
   updateCheckList: (val: string[]) => void;
+  isTask: boolean;
 }
 
 export const Description = ({
@@ -48,6 +49,7 @@ export const Description = ({
   updateGoalTime,
   checkList,
   updateCheckList,
+  isTask,
 }: IDescriptionProps) => {
   const {theme} = useTheme();
 
@@ -63,10 +65,10 @@ export const Description = ({
 
   return (
     <View style={[styles.wrapper]}>
-      <Title title="Define your habit" />
+      <Title title={`Define your ${isTask ? 'task' : 'habit'}`} />
       <View style={styles.container}>
         <TextInput
-          label="Habit"
+          label={isTask ? 'Task' : 'Habit'}
           onChangeText={updateName}
           value={name}
           placeholder=""

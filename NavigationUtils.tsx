@@ -11,7 +11,7 @@ import {ICategory} from './src/database/models/category';
 
 export type TStackScreens = {
   Home: undefined;
-  Add: undefined;
+  Add: {isTask: boolean};
   Search: {text: string};
   HabitInfo: {habit: THabit; category: ICategory; tab: HABIT_INFO_TAB};
   Archived: undefined;

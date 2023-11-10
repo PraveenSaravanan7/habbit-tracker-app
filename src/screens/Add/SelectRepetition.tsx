@@ -23,16 +23,35 @@ import {Select} from '../../components/Select';
 interface ISelectRepetitionProps {
   repeatConfig: THabit['repeatConfig'];
   updateRepeatConfig: (val: THabit['repeatConfig']) => void;
+  isTask: boolean;
 }
 
 export const SelectRepetition = ({
   repeatConfig,
   updateRepeatConfig,
+  isTask,
 }: ISelectRepetitionProps) => {
   return (
     <View style={[styles.wrapper]}>
       <Title title="How often do you want to do it?" />
       <View style={[styles.container]}>
+        {isTask && (
+          <Pressable
+            style={[styles.item]}
+            onPress={() =>
+              updateRepeatConfig({
+                repeatType: REPEAT_TYPE.NO_REPEAT,
+                days: undefined,
+              })
+            }>
+            <Radio
+              size={20}
+              selected={repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT}
+            />
+            <TextContent style={styles.itemText}>No repetition</TextContent>
+          </Pressable>
+        )}
+
         <Pressable
           style={[styles.item]}
           onPress={() =>
@@ -127,7 +146,7 @@ export const SelectRepetition = ({
 const DayList = ({
   repeatConfig,
   updateRepeatConfig,
-}: ISelectRepetitionProps) => {
+}: Omit<ISelectRepetitionProps, 'isTask'>) => {
   const {theme} = useTheme();
 
   const addOrRemoveDay = (day: DAY_OF_THE_MONTH | DAY_OF_THE_WEEK) => {
@@ -173,7 +192,7 @@ const DayList = ({
 const DateList = ({
   repeatConfig,
   updateRepeatConfig,
-}: ISelectRepetitionProps) => {
+}: Omit<ISelectRepetitionProps, 'isTask'>) => {
   const {theme} = useTheme();
 
   const [openModal, setOpenModal] = useState(false);

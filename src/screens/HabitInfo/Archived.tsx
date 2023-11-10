@@ -3,7 +3,7 @@ import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import getHabitModel, {THabit} from '../../database/models/habit';
 import getCategoryModel, {ICategory} from '../../database/models/category';
-import {convertHexToRGBA, getRepeatText} from '../../utils';
+import {convertHexToRGBA} from '../../utils';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import {CategoryIcon} from '../components/CategoryIcon';
@@ -81,7 +81,17 @@ export const Archived = () => {
                     ]}>
                     <TextContent
                       style={[styles.labelText, {color: category.color}]}>
-                      {getRepeatText(habit)}
+                      {habit.isTask ? 'Task' : 'Habit'}
+                      {habit.priority > 1 ? (
+                        <>
+                          {` | ${habit.priority}`}
+                          <MaterialCommunityIcons
+                            name="flag-outline"
+                            color={category.color}
+                            size={10}
+                          />
+                        </>
+                      ) : null}
                     </TextContent>
                   </View>
                 </View>

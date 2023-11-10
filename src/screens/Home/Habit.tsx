@@ -1,6 +1,6 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, ToastAndroid, View} from 'react-native';
-import getHabitModel, {THabit} from '../../database/models/habit';
+import getHabitModel, {REPEAT_TYPE, THabit} from '../../database/models/habit';
 import {TextContent} from '../../components/TextContent';
 import database, {
   HABIT_MODEL_EVENT,
@@ -25,7 +25,11 @@ import {commonColors} from '../../../themes';
 import {Modal} from '../../components/Modal';
 import {ConfirmationModal} from '../components/ConfirmationModal';
 
-export const Habit = () => {
+interface IHabitProps {
+  tasksMode: boolean;
+}
+
+export const Habit = ({tasksMode}: IHabitProps) => {
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [history, setHistory] = useState<IHistory[]>([]);
@@ -57,12 +61,15 @@ export const Habit = () => {
       ),
     );
 
-  const updateHabit = () =>
-    setHabits(() =>
-      [...getHabitModel().find()]
-        .filter(habit => !habit.archived)
-        .sort((a, b) => b.priority - a.priority),
-    );
+  const updateHabit = useCallback(
+    () =>
+      setHabits(() =>
+        [...getHabitModel().find()]
+          .filter(habit => !habit.archived && habit.isTask === tasksMode)
+          .sort((a, b) => b.priority - a.priority),
+      ),
+    [tasksMode],
+  );
 
   const onDelete = (habit: THabit) => {
     getHabitModel().remove(habit?.$loki || 0);
@@ -90,7 +97,7 @@ export const Habit = () => {
       database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
       database.removeListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
     };
-  }, []);
+  }, [updateHabit]);
 
   useEffect(() => {
     updateHabit();
@@ -117,6 +124,23 @@ export const Habit = () => {
           const category = getCategory(habit);
 
           if (!category) return null;
+
+          if (habit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
+            return (
+              <Pressable
+                onPress={() => setActiveHabit(habit)}
+                style={[
+                  styles.item,
+                  {backgroundColor: theme.colors.surface[100]},
+                ]}
+                key={key}>
+                <Title
+                  habit={habit}
+                  category={category}
+                  repeatInfo={getRepeatText(habit) || ''}
+                />
+              </Pressable>
+            );
 
           return (
             <Pressable

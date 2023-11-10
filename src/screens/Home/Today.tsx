@@ -176,7 +176,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
                   ]}>
                   <TextContent
                     style={[styles.labelText, {color: category.color}]}>
-                    Habit
+                    {habit.isTask ? 'Task' : 'Habit'}
                     {habit.priority > 1 ? (
                       <>
                         {` | ${habit.priority}`}
