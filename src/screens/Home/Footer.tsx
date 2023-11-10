@@ -22,7 +22,7 @@ const tabs: {name: MAIN_TABS; iconName: string}[] = [
     iconName: 'reload',
   },
   {
-    name: MAIN_TABS.TODO,
+    name: MAIN_TABS.TASK,
     iconName: 'checkbox-marked-circle-outline',
   },
   {

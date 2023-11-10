@@ -109,7 +109,7 @@ interface IHabitBase<
   endDate?: string;
   priority: number;
   archived?: boolean;
-  isTodo?: boolean;
+  isTask?: boolean;
 }
 
 interface INumericHabit

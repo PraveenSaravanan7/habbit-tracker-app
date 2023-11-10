@@ -1,6 +1,6 @@
 export enum MAIN_TABS {
   TODAY = 'Today',
-  TODO = 'Todo',
+  TASK = 'Task',
   CATEGORY = 'Category',
   HABIT = 'Habit',
   TIMER = 'Timer',
