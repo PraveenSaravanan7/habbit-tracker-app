@@ -112,6 +112,7 @@ interface IHabitBase<
   priority: number;
   archived?: boolean;
   isTask?: boolean;
+  isCompleted?: boolean; // Hold the latest activity state
 }
 
 interface INumericHabit

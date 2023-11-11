@@ -1,11 +1,20 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {COMPARISON_TYPE, HABIT_TYPES, THabit} from '../database/models/habit';
+import getHabitModel, {
+  COMPARISON_TYPE,
+  HABIT_TYPES,
+  REPEAT_TYPE,
+  THabit,
+} from '../database/models/habit';
 import moment, {Moment} from 'moment';
 import getHistoryModel, {IHistory} from '../database/models/history';
 import {NumberInputModal} from '../screens/components/NumberInputModal';
 import {CheckListModal} from '../screens/components/CheckListModal';
 import {TimeInputModal} from '../screens/components/TimeInputModal';
-import {HISTORY_MODEL_EVENT, emitDatabaseEvent} from '../database/database';
+import {
+  HABIT_MODEL_EVENT,
+  HISTORY_MODEL_EVENT,
+  emitDatabaseEvent,
+} from '../database/database';
 import {addTimes, getSeconds} from '../utils';
 import {ToastAndroid} from 'react-native';
 
@@ -73,8 +82,6 @@ export const useHabitUpdate = () => {
 
   const updateProgressInDb = useCallback(
     (progress?: number | string | number[]) => {
-      const historyModel = getHistoryModel();
-
       const record = getHistoryRecord();
       const habitProgress = record?.habits.find(
         h => h.habitId === activeHabit?.id,
@@ -134,7 +141,10 @@ export const useHabitUpdate = () => {
 
       habitProgress.progress = progress;
 
-      historyModel.update(record);
+      activeHabit.isCompleted = habitProgress.completed;
+
+      getHistoryModel().update(record);
+      getHabitModel().update(activeHabit);
 
       setHistoryUpdated(prev => prev + 1);
       setOpenModal(false);
@@ -143,6 +153,9 @@ export const useHabitUpdate = () => {
       setAdditionalProgressInTime('');
 
       emitDatabaseEvent(HISTORY_MODEL_EVENT.UPDATE_HISTORY);
+
+      if (activeHabit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
+        emitDatabaseEvent(HABIT_MODEL_EVENT.UPDATED_SINGLE_TASK);
     },
     [activeHabit, getHistoryRecord],
   );

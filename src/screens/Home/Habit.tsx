@@ -24,19 +24,27 @@ import {CategoryIcon} from '../components/CategoryIcon';
 import {commonColors} from '../../../themes';
 import {Modal} from '../../components/Modal';
 import {ConfirmationModal} from '../components/ConfirmationModal';
+import {ProgressButton} from '../components/ProgressButtom';
+import {Header} from '../../components/Header';
 
 interface IHabitProps {
   tasksMode: boolean;
 }
 
-export const Habit = ({tasksMode}: IHabitProps) => {
-  const [habits, setHabits] = useState<THabit[]>([]);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [history, setHistory] = useState<IHistory[]>([]);
-  const [activeHabit, setActiveHabit] = useState<THabit>();
+enum TABS {
+  TODO = 'Todo',
+  COMPLETED = 'Completed',
+}
 
+export const Habit = ({tasksMode}: IHabitProps) => {
   const {theme} = useTheme();
   const {UpdateUi, updateProgress} = useHabitUpdate();
+
+  const [habits, setHabits] = useState<THabit[]>([]);
+  const [categories] = useState<ICategory[]>(() => getCategoryModel().find());
+  const [history, setHistory] = useState<IHistory[]>([]);
+  const [activeHabit, setActiveHabit] = useState<THabit>();
+  const [activeTab, setActiveTab] = useState<TABS>(TABS.TODO);
 
   const getCategory = (habit: THabit) =>
     categories.find(category => category.id === habit.category);
@@ -50,25 +58,54 @@ export const Habit = ({tasksMode}: IHabitProps) => {
     return list;
   }, []);
 
-  const updateHistory = () =>
-    setHistory(() =>
-      JSON.parse(
-        JSON.stringify(
-          getHistoryModel().find({
-            date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
-          }),
+  const updateHistory = useCallback(
+    () =>
+      setHistory(() =>
+        JSON.parse(
+          JSON.stringify(
+            getHistoryModel().find({
+              date: {$in: days.map(day => day.format('DD/MM/YYYY'))},
+            }),
+          ),
         ),
       ),
-    );
+    [days],
+  );
 
   const updateHabit = useCallback(
     () =>
       setHabits(() =>
         [...getHabitModel().find()]
-          .filter(habit => !habit.archived && habit.isTask === tasksMode)
+          .filter(habit => {
+            if (habit.archived) return false;
+
+            if (!tasksMode) return !habit.isTask;
+
+            // below is for taskMode
+            if (!habit.isTask) return false;
+
+            // below isTask is true
+            if (habit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
+              return activeTab === TABS.TODO
+                ? !habit?.isCompleted
+                : habit?.isCompleted;
+
+            // below is repeating tasks
+            if (habit.endDate) {
+              const today = moment().startOf('day');
+              const endDate = moment(habit.endDate, 'DD/MM/YYYY');
+
+              return activeTab === TABS.TODO
+                ? today.isSameOrBefore(endDate)
+                : today.isAfter(endDate);
+            }
+
+            // below is repeating tasks without endDateI
+            return activeTab === TABS.TODO;
+          })
           .sort((a, b) => b.priority - a.priority),
       ),
-    [tasksMode],
+    [activeTab, tasksMode],
   );
 
   const onDelete = (habit: THabit) => {
@@ -90,23 +127,25 @@ export const Habit = ({tasksMode}: IHabitProps) => {
   };
 
   useEffect(() => {
+    updateHabit();
+
     database.addListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
     database.addListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
+    database.addListener(HABIT_MODEL_EVENT.UPDATED_SINGLE_TASK, updateHabit);
 
     return () => {
       database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
       database.removeListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
+      database.removeListener(
+        HABIT_MODEL_EVENT.UPDATED_SINGLE_TASK,
+        updateHabit,
+      );
     };
   }, [updateHabit]);
 
   useEffect(() => {
-    updateHabit();
-    setCategories(getCategoryModel().find());
     updateHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  useEffect(() => {
     database.addListener(HISTORY_MODEL_EVENT.UPDATE_HISTORY, updateHistory);
 
     return () =>
@@ -114,12 +153,18 @@ export const Habit = ({tasksMode}: IHabitProps) => {
         HISTORY_MODEL_EVENT.UPDATE_HISTORY,
         updateHistory,
       );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [updateHistory]);
 
   return (
     <>
       <View style={[styles.container]}>
+        {tasksMode && (
+          <Header.Tabs
+            activeTab={activeTab}
+            onSelectTab={tab => setActiveTab(tab as TABS)}
+            tabs={Object.values(TABS)}
+          />
+        )}
         {habits.map((habit, key) => {
           const category = getCategory(habit);
 
@@ -128,16 +173,21 @@ export const Habit = ({tasksMode}: IHabitProps) => {
           if (habit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
             return (
               <Pressable
-                onPress={() => setActiveHabit(habit)}
                 style={[
                   styles.item,
                   {backgroundColor: theme.colors.surface[100]},
                 ]}
                 key={key}>
-                <Title
+                <Todo
                   habit={habit}
                   category={category}
-                  repeatInfo={getRepeatText(habit) || ''}
+                  progress={getHistoryModel()
+                    .findOne({date: habit.startDate})
+                    ?.habits.find(candidate => candidate.habitId === habit.id)}
+                  onPress={() => setActiveHabit(habit)}
+                  onProgressButtonPress={() =>
+                    updateProgress(habit, moment(habit.startDate, 'DD/MM/YYYY'))
+                  }
                 />
               </Pressable>
             );
@@ -181,6 +231,64 @@ export const Habit = ({tasksMode}: IHabitProps) => {
   );
 };
 
+interface ITodoProps {
+  habit: THabit;
+  category: ICategory;
+  progress?: IHistory['habits'][0];
+  onPress: () => void;
+  onProgressButtonPress: () => void;
+}
+
+const Todo = ({
+  habit,
+  category,
+  progress,
+  onPress,
+  onProgressButtonPress,
+}: ITodoProps) => (
+  <Pressable onPress={onPress} style={[styles.todoContainer]}>
+    <CategoryIcon
+      category={category}
+      size={36}
+      borderRadius={12}
+      iconSize={22}
+    />
+    <View style={styles.habitNameContainer}>
+      <TextContent style={[styles.habitName]}>
+        {habit.habitName} {'' + habit.isCompleted}
+      </TextContent>
+      <View
+        style={[
+          styles.label,
+          {backgroundColor: convertHexToRGBA(category.color, 0.2)},
+        ]}>
+        <TextContent style={[styles.labelText, {color: category.color}]}>
+          {habit.startDate}
+          {habit.priority > 1 ? (
+            <>
+              {` | ${habit.priority}`}
+              <MaterialCommunityIcons
+                name="flag-outline"
+                color={category.color}
+                size={10}
+              />
+            </>
+          ) : null}
+        </TextContent>
+      </View>
+    </View>
+    <Pressable
+      onPress={onProgressButtonPress}
+      style={styles.progressButtonWrapper}>
+      <ProgressButton
+        currentDate={moment(habit.startDate, 'DD/MM/YYYY')}
+        habit={habit}
+        progress={progress}
+      />
+    </Pressable>
+  </Pressable>
+);
+
 interface ITitleProps {
   habit: THabit;
   category: ICategory;
@@ -198,6 +306,16 @@ const Title = ({habit, category, repeatInfo}: ITitleProps) => (
         ]}>
         <TextContent style={[styles.labelText, {color: category.color}]}>
           {repeatInfo}
+          {habit.priority > 1 ? (
+            <>
+              {` | ${habit.priority}`}
+              <MaterialCommunityIcons
+                name="flag-outline"
+                color={category.color}
+                size={10}
+              />
+            </>
+          ) : null}
         </TextContent>
       </View>
     </View>
@@ -494,6 +612,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  todoContainer: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    columnGap: 16,
+  },
+  progressButtonWrapper: {marginLeft: 'auto'},
   habitName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',

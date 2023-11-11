@@ -10,9 +10,15 @@ interface IHeaderBaseProps {
   icon?: JSX.Element;
 }
 
+interface ITabProps {
+  tabs: string[];
+  activeTab: string;
+  onSelectTab: (tab: string) => void;
+}
+
 type THeaderProps = (
   | {tabs?: never; activeTab?: never; onSelectTab?: never}
-  | {tabs: string[]; activeTab: string; onSelectTab: (tab: string) => void}
+  | ITabProps
 ) &
   IHeaderBaseProps;
 
@@ -51,39 +57,49 @@ export const Header = ({
         </View>
         {icon}
       </View>
-      {tabs && (
-        <View style={styles.tabContainer}>
-          {tabs.map((tabName, index) => (
-            <Pressable
-              onPress={() => onSelectTab(tabName)}
-              style={[
-                styles.tabItem,
-                activeTab === tabName && styles.activeTab,
-                {borderBottomColor: theme.colors.primary[100]},
-              ]}
-              key={index}>
-              <TextContent
-                style={[
-                  [
-                    styles.tabName,
-                    activeTab === tabName && styles.activeTabName,
-                    {
-                      color:
-                        activeTab === tabName
-                          ? theme.colors.text
-                          : theme.colors.disabledText,
-                    },
-                  ],
-                ]}>
-                {tabName}
-              </TextContent>
-            </Pressable>
-          ))}
-        </View>
+      {!!tabs && (
+        <Tabs activeTab={activeTab} onSelectTab={onSelectTab} tabs={tabs} />
       )}
     </View>
   );
 };
+
+const Tabs = ({tabs, activeTab, onSelectTab}: ITabProps) => {
+  const {theme} = useTheme();
+
+  return (
+    <View style={styles.tabContainer}>
+      {tabs.map((tabName, index) => (
+        <Pressable
+          onPress={() => onSelectTab(tabName)}
+          style={[
+            styles.tabItem,
+            activeTab === tabName && styles.activeTab,
+            {borderBottomColor: theme.colors.primary[100]},
+          ]}
+          key={index}>
+          <TextContent
+            style={[
+              [
+                styles.tabName,
+                activeTab === tabName && styles.activeTabName,
+                {
+                  color:
+                    activeTab === tabName
+                      ? theme.colors.text
+                      : theme.colors.disabledText,
+                },
+              ],
+            ]}>
+            {tabName}
+          </TextContent>
+        </Pressable>
+      ))}
+    </View>
+  );
+};
+
+Header.Tabs = Tabs;
 
 const styles = StyleSheet.create({
   tabName: {

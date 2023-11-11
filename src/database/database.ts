@@ -20,6 +20,7 @@ const database = new loki('db.json', {
 export enum HABIT_MODEL_EVENT {
   ADD_HABIT = 'add_habit',
   UPDATE_HABIT = 'update_habit',
+  UPDATED_SINGLE_TASK = 'update_single_task',
 }
 
 export enum HISTORY_MODEL_EVENT {
