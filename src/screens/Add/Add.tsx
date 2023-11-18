@@ -118,6 +118,11 @@ export const Add = () => {
       endDate:
         repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT ? startDate : endDate,
       isTask,
+      analytics: {
+        completedDays: 0,
+        streaks: 0,
+        streaksHistory: [],
+      },
     };
 
     if (habit.habitType === HABIT_TYPES.NUMERIC)

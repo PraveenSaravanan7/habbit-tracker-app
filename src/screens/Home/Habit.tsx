@@ -304,7 +304,11 @@ const Title = ({habit, category, repeatInfo}: ITitleProps) => (
           styles.label,
           {backgroundColor: convertHexToRGBA(category.color, 0.2)},
         ]}>
-        <TextContent style={[styles.labelText, {color: category.color}]}>
+        <TextContent
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          maxScreenWidth={0.6}
+          style={[styles.labelText, {color: category.color}]}>
           {repeatInfo}
           {habit.priority > 1 ? (
             <>
@@ -347,7 +351,9 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
             size={18}
             color={category.color}
           />
-          <TextContent style={styles.bottomMenuItemText}>0</TextContent>
+          <TextContent style={styles.bottomMenuItemText}>
+            {habit.analytics.streaks}
+          </TextContent>
         </View>
         <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
@@ -355,7 +361,9 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
             size={18}
             color={category.color}
           />
-          <TextContent style={styles.bottomMenuItemText}>10%</TextContent>
+          <TextContent style={styles.bottomMenuItemText}>
+            {habit.analytics.completedDays}%
+          </TextContent>
         </View>
       </View>
       <View style={[styles.itemBottomPart2]}>

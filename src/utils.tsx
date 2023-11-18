@@ -1,5 +1,5 @@
 import moment, {Moment} from 'moment';
-import {REPEAT_TYPE, THabit} from './database/models/habit';
+import {REPEAT_TYPE, THabit, THistoryItem} from './database/models/habit';
 import {IHistory} from './database/models/history';
 
 export const convertHexToRGBA = (hexCode: string, opacity = 1) => {
@@ -131,4 +131,183 @@ export const formatTime = (time: number) => {
   const seconds = pad(Math.floor(time % 60));
 
   return `${hours}:${minutes}:${seconds}`;
+};
+
+const getNthDay = (date: Moment, habit: THabit): number => {
+  const {
+    repeatConfig: {repeatType, days},
+    startDate,
+  } = habit;
+  const start = moment(startDate, 'DD/MM/YYYY');
+
+  if (repeatType === REPEAT_TYPE.NO_REPEAT) return 1;
+
+  if (repeatType === REPEAT_TYPE.EVERY_DAY) return date.diff(start, 'day') + 1;
+
+  let n = 0;
+  const format =
+    repeatType === REPEAT_TYPE.DAY_OF_THE_WEEK
+      ? 'ddd'
+      : repeatType === REPEAT_TYPE.DAY_OF_THE_MONTH
+      ? 'D'
+      : 'MMMM D';
+
+  while (start.isSameOrBefore(date)) {
+    if (days && (days as string[]).includes(start.format(format))) n++;
+
+    start.add(1, 'day');
+  }
+
+  console.log(
+    'getNthDay for ' +
+      date.format('DD/MM/YYYY') +
+      +'format ' +
+      format +
+      'n ' +
+      n,
+  );
+
+  return n;
+};
+
+export const updateHabitAnalytics = (
+  habit: THabit,
+  date: Moment,
+  completed: boolean,
+) => {
+  const {analytics} = habit;
+  const currentDate = getNthDay(date, habit);
+
+  if (completed && analytics.streaksHistory.length === 0) {
+    analytics.streaksHistory = [[currentDate, currentDate, 1]];
+    analytics.completedDays = 1;
+    analytics.streaks = 1;
+
+    return;
+  }
+
+  const streakHistoryCopy: [number, number, number][] = [];
+  const ONE_DAY = 1;
+
+  if (completed) {
+    let inserted = false;
+
+    for (let i = 0; i < analytics.streaksHistory.length; i++) {
+      const item: THistoryItem = [...analytics.streaksHistory[i]];
+
+      if (inserted) {
+        const prev = streakHistoryCopy.at(-1) as [number, number, number];
+        if (prev[1] + 1 === item[0]) {
+          prev[1] = item[1];
+          prev[2] += item[2];
+        } else streakHistoryCopy.push(item);
+
+        continue;
+      }
+
+      if (currentDate > item[0] && currentDate < item[1]) {
+        item[2]++;
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      if (currentDate === item[0] - ONE_DAY) {
+        item[0] = currentDate;
+        item[2]++;
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      if (currentDate === item[1] + ONE_DAY) {
+        item[1] = currentDate;
+        item[2]++;
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      if (
+        currentDate > item[1] &&
+        (i === analytics.streaksHistory.length - 1
+          ? true
+          : currentDate < analytics.streaksHistory[i + 1][0])
+      ) {
+        streakHistoryCopy.push(item);
+        streakHistoryCopy.push([currentDate, currentDate, 1]);
+        inserted = true;
+        continue;
+      }
+
+      if (
+        currentDate < item[0] &&
+        (i === 0 ? true : currentDate < analytics.streaksHistory[i - 1][0])
+      ) {
+        streakHistoryCopy.push([currentDate, currentDate, 1]);
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      streakHistoryCopy.push(item);
+    }
+  } else {
+    let inserted = false;
+
+    for (let i = 0; i < analytics.streaksHistory.length; i++) {
+      const item: THistoryItem = [...analytics.streaksHistory[i]];
+
+      if (inserted) {
+        streakHistoryCopy.push(item);
+        continue;
+      }
+
+      if (currentDate === item[0] && currentDate === item[1]) {
+        inserted = true;
+        continue;
+      }
+
+      if (currentDate === item[0]) {
+        item[0] = currentDate + ONE_DAY;
+        item[2]--;
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      if (currentDate === item[1]) {
+        item[1] = currentDate - ONE_DAY;
+        item[2]--;
+        streakHistoryCopy.push(item);
+        inserted = true;
+        continue;
+      }
+
+      if (currentDate > item[0] && currentDate < item[1]) {
+        const a: THistoryItem = [item[0], currentDate - 1, 0];
+        a[2] = a[1] - a[0] + 1;
+        streakHistoryCopy.push(a);
+
+        const b: THistoryItem = [currentDate + 1, item[1], 0];
+        b[2] = b[1] - b[0] + 1;
+        streakHistoryCopy.push(b);
+
+        inserted = true;
+        continue;
+      }
+
+      streakHistoryCopy.push(item);
+    }
+  }
+
+  const latestHistory = streakHistoryCopy[streakHistoryCopy.length - 1];
+
+  analytics.streaks = latestHistory[2];
+  analytics.streaksHistory = streakHistoryCopy;
+  analytics.completedDays = completed
+    ? analytics.completedDays + 1
+    : analytics.completedDays - 1;
+
+  console.log(analytics);
 };

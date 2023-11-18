@@ -51,7 +51,11 @@ export const Header = ({
               size={24}
             />
           </Pressable>
-          <TextContent style={[styles.title, {color: theme.colors.text}]}>
+          <TextContent
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            maxScreenWidth={0.75}
+            style={[styles.title, {color: theme.colors.text}]}>
             {title}
           </TextContent>
         </View>

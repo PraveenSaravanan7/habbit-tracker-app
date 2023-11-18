@@ -91,6 +91,8 @@ interface IRepeatConfig<
   days: Days;
 }
 
+export type THistoryItem = [number, number, number];
+
 interface IHabitBase<
   HabitType extends HABIT_TYPES,
   HabitConfig extends Record<string, string | string[] | number> | undefined,
@@ -113,6 +115,11 @@ interface IHabitBase<
   archived?: boolean;
   isTask?: boolean;
   isCompleted?: boolean; // Hold the latest activity state
+  analytics: {
+    streaks: number;
+    completedDays: number;
+    streaksHistory: THistoryItem[]; // [startDay, endDay, completedCount]
+  };
 }
 
 interface INumericHabit

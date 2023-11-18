@@ -15,7 +15,7 @@ import {
   HISTORY_MODEL_EVENT,
   emitDatabaseEvent,
 } from '../database/database';
-import {addTimes, getSeconds} from '../utils';
+import {addTimes, getSeconds, updateHabitAnalytics} from '../utils';
 import {ToastAndroid} from 'react-native';
 
 export const useHabitUpdate = () => {
@@ -143,6 +143,12 @@ export const useHabitUpdate = () => {
 
       activeHabit.isCompleted = habitProgress.completed;
 
+      updateHabitAnalytics(
+        activeHabit,
+        moment(activeDate, 'DD/MM/YYYY'),
+        activeHabit.isCompleted,
+      );
+
       getHistoryModel().update(record);
       getHabitModel().update(activeHabit);
 
@@ -157,7 +163,7 @@ export const useHabitUpdate = () => {
       if (activeHabit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
         emitDatabaseEvent(HABIT_MODEL_EVENT.UPDATED_SINGLE_TASK);
     },
-    [activeHabit, getHistoryRecord],
+    [activeDate, activeHabit, getHistoryRecord],
   );
 
   const updateProgress = useCallback(
