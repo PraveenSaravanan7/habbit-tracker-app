@@ -104,7 +104,11 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
               />
 
               <View style={styles.nameContainer}>
-                <TextContent style={styles.habitName}>
+                <TextContent
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  maxScreenWidth={0.65}
+                  style={styles.habitName}>
                   {habit.habitName}
                 </TextContent>
                 <View

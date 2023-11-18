@@ -298,7 +298,13 @@ interface ITitleProps {
 const Title = ({habit, category, repeatInfo}: ITitleProps) => (
   <View style={[styles.itemTop]}>
     <View style={styles.habitNameContainer}>
-      <TextContent style={[styles.habitName]}>{habit.habitName}</TextContent>
+      <TextContent
+        numberOfLines={2}
+        ellipsizeMode="tail"
+        maxScreenWidth={0.8}
+        style={[styles.habitName]}>
+        {habit.habitName}
+      </TextContent>
       <View
         style={[
           styles.label,

@@ -303,11 +303,8 @@ export const updateHabitAnalytics = (
 
   const latestHistory = streakHistoryCopy[streakHistoryCopy.length - 1];
 
-  analytics.streaks = latestHistory[2];
+  analytics.streaks = latestHistory ? latestHistory[2] : 0;
   analytics.streaksHistory = streakHistoryCopy;
-  analytics.completedDays = completed
-    ? analytics.completedDays + 1
-    : analytics.completedDays - 1;
 
   console.log(analytics);
 };
