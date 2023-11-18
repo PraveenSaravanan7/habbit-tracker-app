@@ -143,7 +143,9 @@ export const useHabitUpdate = () => {
 
       habitProgress.progress = progress;
 
-      activeHabit.isCompleted = habitProgress.completed;
+      activeHabit.isCompleted = shouldResetProgress
+        ? undefined
+        : habitProgress.completed;
 
       if (shouldResetProgress)
         record.habits = record.habits.filter(

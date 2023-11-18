@@ -85,10 +85,12 @@ export const Habit = ({tasksMode}: IHabitProps) => {
             if (!habit.isTask) return false;
 
             // below isTask is true
-            if (habit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT)
-              return activeTab === TABS.TODO
-                ? !habit?.isCompleted
-                : habit?.isCompleted;
+            if (habit.repeatConfig.repeatType === REPEAT_TYPE.NO_REPEAT) {
+              if (activeTab === TABS.TODO)
+                return habit?.isCompleted === undefined;
+              if (activeTab === TABS.COMPLETED)
+                return habit?.isCompleted !== undefined;
+            }
 
             // below is repeating tasks
             if (habit.endDate) {
@@ -254,9 +256,7 @@ const Todo = ({
       iconSize={22}
     />
     <View style={styles.habitNameContainer}>
-      <TextContent style={[styles.habitName]}>
-        {habit.habitName} {'' + habit.isCompleted}
-      </TextContent>
+      <TextContent style={[styles.habitName]}>{habit.habitName}</TextContent>
       <View
         style={[
           styles.label,
