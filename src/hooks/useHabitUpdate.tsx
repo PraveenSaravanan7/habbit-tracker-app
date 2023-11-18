@@ -71,7 +71,6 @@ export const useHabitUpdate = () => {
     if (!habitProgress) {
       habitProgress = {
         habitId: activeHabit.id,
-        completed: false,
       };
 
       record.habits.push(habitProgress);
@@ -86,13 +85,16 @@ export const useHabitUpdate = () => {
       const habitProgress = record?.habits.find(
         h => h.habitId === activeHabit?.id,
       ); // TODO: Maybe use it from getHistoryRecord
+      let shouldResetProgress = false;
 
       if (!activeHabit || !record || !habitProgress) return;
 
       const {habitConfig, habitType} = activeHabit;
 
-      if (habitType === HABIT_TYPES.YES_OR_NO)
+      if (habitType === HABIT_TYPES.YES_OR_NO) {
+        if (habitProgress.completed === false) shouldResetProgress = true;
         habitProgress.completed = !habitProgress.completed;
+      }
 
       if (habitType === HABIT_TYPES.CHECKLIST && typeof progress === 'object')
         habitProgress.completed =
@@ -143,10 +145,15 @@ export const useHabitUpdate = () => {
 
       activeHabit.isCompleted = habitProgress.completed;
 
+      if (shouldResetProgress)
+        record.habits = record.habits.filter(
+          habit => habit.habitId !== activeHabit.id,
+        );
+
       updateHabitAnalytics(
         activeHabit,
         moment(activeDate, 'DD/MM/YYYY'),
-        activeHabit.isCompleted,
+        shouldResetProgress ? false : !!habitProgress.completed,
       );
 
       getHistoryModel().update(record);

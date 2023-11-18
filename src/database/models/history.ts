@@ -6,7 +6,7 @@ export interface IHistory extends Partial<LokiObj> {
   habits: {
     habitId: string;
     progress?: number | string | number[];
-    completed: boolean;
+    completed?: boolean;
   }[];
 }
 
