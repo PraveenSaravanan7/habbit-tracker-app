@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {DateRange} from './DateRange';
 import {Moment} from 'moment';
 import {Pressable, StyleSheet, View} from 'react-native';
@@ -12,6 +12,7 @@ import {useTheme} from '../../../ThemeProvider';
 import {convertHexToRGBA, isDayDisabled} from '../../utils';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ProgressButton} from '../components/ProgressButtom';
+import database, {HABIT_MODEL_EVENT} from '../../database/database';
 
 export interface ITodayProps {
   currentDate: Moment;
@@ -43,28 +44,13 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const todayHistory = JSON.parse(
-      JSON.stringify(
-        getHistoryModel().findOne({
-          date: currentDate.format('DD/MM/YYYY'),
-        }),
-      ),
-    ) as IHistory;
-    const allHabits = getHabitModel().find();
-    const completion =
-      todayHistory?.habits.reduce((acc, candidate) => {
-        acc.set(candidate.habitId, candidate);
-        return acc;
-      }, new Map<string, IHistory['habits'][0]>()) ||
-      new Map<string, IHistory['habits'][0]>();
-
+  const updateHabit = useCallback(() => {
     setHabits(
-      [...allHabits]
+      [...getHabitModel().find()]
         .filter(habit => !isDayDisabled(currentDate, habit, true))
         .sort((a, b) => {
-          const aHistory = completion.get(a.id);
-          const bHistory = completion.get(b.id);
+          const aHistory = history.get(a.id);
+          const bHistory = history.get(b.id);
 
           if (!aHistory && bHistory) return -1; // a comes before b
 
@@ -73,11 +59,37 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
           return b.priority - a.priority;
         }),
     );
+  }, [currentDate, history]);
+
+  useEffect(() => {
+    const todayHistory = JSON.parse(
+      JSON.stringify(
+        getHistoryModel().findOne({
+          date: currentDate.format('DD/MM/YYYY'),
+        }),
+      ),
+    ) as IHistory;
+    const completion =
+      todayHistory?.habits.reduce((acc, candidate) => {
+        acc.set(candidate.habitId, candidate);
+        return acc;
+      }, new Map<string, IHistory['habits'][0]>()) ||
+      new Map<string, IHistory['habits'][0]>();
 
     setHistory(completion);
   }, [currentDate, historyUpdated]);
 
-  // add habit, update history
+  useEffect(() => {
+    updateHabit();
+
+    database.addListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
+    database.addListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
+
+    return () => {
+      database.removeListener(HABIT_MODEL_EVENT.ADD_HABIT, updateHabit);
+      database.removeListener(HABIT_MODEL_EVENT.UPDATE_HABIT, updateHabit);
+    };
+  }, [updateHabit]);
 
   return (
     <>
