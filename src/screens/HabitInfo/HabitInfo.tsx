@@ -93,7 +93,8 @@ const CalendarTab = ({
   updateHistory: () => void;
 }) => {
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+  const {HabitProgressModels, updateProgress, historyUpdated} =
+    useHabitUpdate();
 
   const colorMap: Record<DAY_COLOR, string[]> = {
     [DAY_COLOR.COMPLETED]: [commonColors.green],
@@ -119,7 +120,7 @@ const CalendarTab = ({
           }
         />
       </ScrollView>
-      <UpdateUi />
+      <HabitProgressModels />
     </>
   );
 };

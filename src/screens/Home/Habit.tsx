@@ -38,7 +38,7 @@ enum TABS {
 
 export const Habit = ({tasksMode}: IHabitProps) => {
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress} = useHabitUpdate();
+  const {HabitProgressModels, updateProgress} = useHabitUpdate();
 
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories] = useState<ICategory[]>(() => getCategoryModel().find());
@@ -218,7 +218,7 @@ export const Habit = ({tasksMode}: IHabitProps) => {
           );
         })}
       </View>
-      <UpdateUi />
+      <HabitProgressModels />
       {activeHabit && (
         <InfoModel
           repeatInfo={getRepeatText(activeHabit) || ''}

@@ -200,7 +200,7 @@ export const useHabitUpdate = () => {
     if (activeHabit?.habitType === HABIT_TYPES.YES_OR_NO) updateProgressInDb();
   }, [activeHabit, updateProgressInDb]);
 
-  const UpdateUi = () => {
+  const HabitProgressModels = () => {
     if (activeHabit?.habitType === HABIT_TYPES.NUMERIC)
       return (
         <NumberInputModal
@@ -239,5 +239,5 @@ export const useHabitUpdate = () => {
     return null;
   };
 
-  return {updateProgress, UpdateUi, historyUpdated};
+  return {updateProgress, HabitProgressModels, historyUpdated};
 };

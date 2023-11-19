@@ -20,7 +20,8 @@ export interface ITodayProps {
 
 export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+  const {HabitProgressModels, updateProgress, historyUpdated} =
+    useHabitUpdate();
 
   const [habits, setHabits] = useState<THabit[]>([]);
   const [categories, setCategories] = useState<Map<string, ICategory>>(
@@ -141,7 +142,7 @@ export const Today = ({currentDate, updateCurrentDate}: ITodayProps) => {
           );
         })}
       </View>
-      <UpdateUi />
+      <HabitProgressModels />
     </>
   );
 };

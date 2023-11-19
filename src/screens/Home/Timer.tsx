@@ -12,7 +12,8 @@ import moment from 'moment';
 
 export const Timer = () => {
   const {theme} = useTheme();
-  const {UpdateUi, updateProgress, historyUpdated} = useHabitUpdate();
+  const {HabitProgressModels, updateProgress, historyUpdated} =
+    useHabitUpdate();
 
   const [isRunning, setIsRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -109,7 +110,7 @@ export const Timer = () => {
         />
       )}
 
-      <UpdateUi />
+      <HabitProgressModels />
     </>
   );
 };
