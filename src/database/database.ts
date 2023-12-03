@@ -10,12 +10,14 @@ const database = new loki('db.json', {
   autosave: true,
   autosaveInterval: 10000, // 10 sec
   autoloadCallback: () => {
-    console.log('--autoloadCallback');
-    //Todo: Add migration script
-
     migration();
+    emitDatabaseEvent(DATABASE_EVENTS.STARTED);
   },
 });
+
+export enum DATABASE_EVENTS {
+  STARTED = 'started',
+}
 
 export enum HABIT_MODEL_EVENT {
   ADD_HABIT = 'add_habit',
@@ -28,7 +30,7 @@ export enum HISTORY_MODEL_EVENT {
 }
 
 export const emitDatabaseEvent = (
-  event: HABIT_MODEL_EVENT | HISTORY_MODEL_EVENT,
+  event: DATABASE_EVENTS | HABIT_MODEL_EVENT | HISTORY_MODEL_EVENT,
 ) => {
   try {
     database.emit(event);
