@@ -256,14 +256,22 @@ const Todo = ({
       iconSize={22}
     />
     <View style={styles.habitNameContainer}>
-      <TextContent style={[styles.habitName]}>{habit.habitName}</TextContent>
+      <TextContent
+        numberOfLines={2}
+        ellipsizeMode="tail"
+        maxScreenWidth={0.6}
+        style={[styles.habitName]}>
+        {habit.habitName}
+      </TextContent>
       <View
         style={[
           styles.label,
           {backgroundColor: convertHexToRGBA(category.color, 0.2)},
         ]}>
         <TextContent style={[styles.labelText, {color: category.color}]}>
-          {habit.startDate}
+          {moment(habit.startDate, 'DD/MM/YYYY').isSame(moment().startOf('d'))
+            ? 'Today'
+            : habit.startDate}
           {habit.priority > 1 ? (
             <>
               {` | ${habit.priority}`}
