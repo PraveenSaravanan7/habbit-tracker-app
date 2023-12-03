@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Pressable, StatusBar, StyleSheet, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../../ThemeProvider';
 import {TextContent} from '../../components/TextContent';
 import {MAIN_TABS} from './types';
@@ -55,13 +54,13 @@ export const Header = ({
           </TextContent>
         </View>
         <View style={[styles.iconContainer]}>
-          <Pressable>
+          {/* <Pressable>
             <MaterialIcons
               name={'search'}
               color={theme.colors.text}
               size={28}
             />
-          </Pressable>
+          </Pressable> */}
           {activeTab === MAIN_TABS.TODAY && (
             <Pressable onPress={() => updateCalendarModalVisibility(true)}>
               <MaterialCommunityIcons

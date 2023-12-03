@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   wrapper: {marginTop: 0},
   container: {
     // marginBottom: 20,
-    borderWidth: 1,
+    borderWidth: 1.8,
     borderColor: 'red',
     paddingHorizontal: 8,
     paddingVertical: 10,

@@ -361,7 +361,7 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
             {habit.analytics.streaks}
           </TextContent>
         </View>
-        <View style={[styles.bottomMenuItem]}>
+        {/* <View style={[styles.bottomMenuItem]}>
           <MaterialCommunityIcons
             name="check-circle-outline"
             size={18}
@@ -370,7 +370,7 @@ const BottomMenu = ({category, habit}: IBottomMenuProps) => {
           <TextContent style={styles.bottomMenuItemText}>
             {habit.analytics.completedDays}%
           </TextContent>
-        </View>
+        </View> */}
       </View>
       <View style={[styles.itemBottomPart2]}>
         <Pressable
